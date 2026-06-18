@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>AI Stick — Runyoro-Rutooro ↔ English Translator</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script>
+    tailwind.config = {
+      darkMode:"class",
+      theme:{extend:{
+        colors:{
+          "on-background":"#191c1e","surface-container-high":"#e6e8ea",
+          "primary-fixed":"#e3dfff","on-surface":"#191c1e",
+          "on-primary-container":"#8683ba","secondary-fixed":"#89f5e7",
+          "surface-container-low":"#f2f4f6","background":"#f7f9fb",
+          "on-primary-fixed":"#181445","on-secondary-fixed-variant":"#005049",
+          "secondary-fixed-dim":"#6bd8cb","on-secondary-container":"#006f66",
+          "on-primary-fixed-variant":"#444173","outline-variant":"#c8c5d0",
+          "surface":"#f7f9fb","surface-container":"#eceef0",
+          "secondary":"#006a61","surface-container-highest":"#e0e3e5",
+          "secondary-container":"#86f2e4","outline":"#787680",
+          "surface-container-lowest":"#ffffff","on-primary":"#ffffff",
+          "primary":"#070235","error":"#ba1a1a","on-secondary":"#ffffff",
+          "on-surface-variant":"#47464f","primary-container":"#1e1b4b",
+          "primary-fixed-dim":"#c4c1fb","surface-dim":"#d8dadc",
+        },
+        spacing:{"lg":"24px","xl":"40px","sm":"12px","xs":"4px","base":"8px","md":"16px","gutter":"16px","margin":"20px"}
+      }}
+    }
+  </script>
+  <style>
+    .material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;}
+    body{font-family:'Inter',sans-serif;background:#f7f9fb;}
+    @keyframes thinking{0%,100%{opacity:.3}50%{opacity:1}}
+    .thinking-dot{animation:thinking 1.2s ease-in-out infinite;}
+    .thinking-dot:nth-child(2){animation-delay:.2s;}
+    .thinking-dot:nth-child(3){animation-delay:.4s;}
+    textarea:focus{outline:none;}
+  </style>
+</head>
+<body class="text-on-background min-h-screen flex flex-col pb-32">
+
+<!-- TOP APP BAR -->
+<header class="bg-surface sticky top-0 z-40 shadow-sm">
+  <div class="flex justify-between items-center w-full px-margin py-base max-w-screen-xl mx-auto">
+    <div class="flex items-center gap-md">
+      <img alt="AI Stick" class="w-10 h-10 object-contain"
+        src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-PrBDA67KP8xrgQb5nN_Jz9EWXvN4902NYA-vSXszfkzjnBl77KH_75ppV0CCo8ghCcvuvcW1efffBoxTq3dqSdaPE_Xj6-P0jag6_fUek3e7Cjl7T33P7Pvv-A6Tyi9WlJGDeyu2qGwlI5cgXcJbFKp7dj9sd5L-BnbMiyZSSeJtmBegiuhhutpdmnTMDeB2w-Nwl0yAl1UGZ0nhFp2JXhuMfebFT_6_mYgNVKcNmtK7IvKkCDf0TFOP8r3unMI7rEBCsBkuV_eX"/>
+      <h1 class="font-bold text-[22px] text-primary leading-none">AI Stick</h1>
+    </div>
+    <div class="flex items-center gap-md">
+      <button id="darkToggle" class="p-xs hover:bg-surface-container rounded-full transition active:scale-95">
+        <span class="material-symbols-outlined text-primary">dark_mode</span>
+      </button>
+      <button class="p-xs hover:bg-surface-container rounded-full transition">
+        <span class="material-symbols-outlined text-primary">settings</span>
+      </button>
+    </div>
+  </div>
+  <!-- AI processing bar -->
+  <div id="progressBar" class="w-full h-1 bg-surface-container overflow-hidden opacity-0 transition-opacity">
+    <div class="h-full bg-secondary w-1/3 animate-pulse"></div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main class="flex-grow flex flex-col max-w-screen-xl mx-auto w-full px-margin py-lg gap-md">
+
+  <!-- Direction selector -->
+  <div class="flex items-center justify-between bg-surface-container-lowest rounded-xl px-sm py-xs shadow-sm border border-outline-variant/10">
+    <div class="flex items-center gap-sm">
+      <button id="btn-rny-en" onclick="setDirection('rny_en')"
+        class="px-md py-xs rounded-full bg-secondary-container text-on-secondary-container text-[13px] font-semibold transition active:scale-90">
+        Runyoro-Rutooro
+      </button>
+      <button id="swapBtn" onclick="swapLanguages()"
+        class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition active:scale-90">
+        <span class="material-symbols-outlined text-secondary" id="swapIcon">swap_horiz</span>
+      </button>
+      <button id="btn-en-rny" onclick="setDirection('en_rny')"
+        class="px-md py-xs rounded-full bg-surface-container text-on-surface-variant text-[13px] font-semibold transition active:scale-90">
+        English
+      </button>
+    </div>
+    <div class="flex items-center gap-sm">
+      <button class="flex items-center gap-xs text-secondary text-[13px] font-semibold hover:underline">
+        <span class="material-symbols-outlined text-[16px]">history</span> History
+      </button>
+    </div>
+  </div>
+
+  <!-- Translation workspace -->
+  <div class="flex-grow flex flex-col md:flex-row gap-md min-h-[480px]">
+
+    <!-- Source card -->
+    <div class="flex-1 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-lg p-lg flex flex-col relative overflow-hidden group">
+      <div class="absolute top-0 left-0 w-full h-1 bg-secondary-container overflow-hidden opacity-0 group-focus-within:opacity-100 transition-opacity" id="inputPulse">
+        <div class="w-1/3 h-full bg-secondary animate-pulse"></div>
+      </div>
+      <div class="flex justify-between items-center mb-md">
+        <span id="srcLabel" class="text-[11px] font-semibold text-outline uppercase tracking-widest">Runyoro-Rutooro</span>
+        <button onclick="clearSource()" class="text-outline hover:text-error transition active:scale-90">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <textarea id="sourceText" oninput="onSourceInput()"
+        class="flex-grow bg-transparent border-none focus:ring-0 text-[18px] text-on-surface resize-none placeholder:text-outline leading-relaxed"
+        placeholder="Enter text here to translate..."
+        rows="8"></textarea>
+      <div class="mt-md flex justify-between items-center border-t border-outline-variant pt-md">
+        <span id="charCount" class="text-outline text-[13px] font-semibold">0 / 5000</span>
+        <div class="flex gap-sm">
+          <button class="p-xs text-outline hover:text-primary transition" title="Voice input">
+            <span class="material-symbols-outlined">mic</span>
+          </button>
+          <button onclick="speakSource()" class="p-xs text-outline hover:text-primary transition" title="Listen">
+            <span class="material-symbols-outlined">volume_up</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Translate button (center) -->
+    <div class="flex flex-row md:flex-col justify-center items-center gap-md">
+      <button onclick="doTranslate()"
+        class="bg-secondary text-on-secondary w-16 h-16 md:w-20 md:h-20 rounded-full shadow-xl flex items-center justify-center active:scale-90 transition hover:opacity-90 group">
+        <span class="material-symbols-outlined text-[32px] md:text-[40px] group-hover:rotate-12 transition-transform">translate</span>
+      </button>
+      <!-- RAG indicator -->
+      <div id="ragBadge" class="hidden flex-col items-center gap-xs">
+        <div class="w-2 h-2 rounded-full bg-secondary animate-pulse"></div>
+        <span class="text-[10px] text-secondary font-semibold">RAG</span>
+      </div>
+    </div>
+
+    <!-- Target card -->
+    <div class="flex-1 bg-white border-2 border-secondary-container rounded-xl shadow-lg p-lg flex flex-col">
+      <div class="flex justify-between items-center mb-md">
+        <span id="tgtLabel" class="text-[11px] font-semibold text-secondary uppercase tracking-widest">English</span>
+        <div class="flex gap-sm">
+          <button onclick="copyTranslation()" class="p-xs text-outline hover:text-primary transition" title="Copy">
+            <span class="material-symbols-outlined">content_copy</span>
+          </button>
+          <button onclick="savePhrase()" class="p-xs text-outline hover:text-primary transition" title="Save">
+            <span class="material-symbols-outlined" id="starIcon">star</span>
+          </button>
+        </div>
+      </div>
+      <div class="flex-grow text-[18px] text-on-surface leading-relaxed flex flex-col justify-start" id="outputArea">
+        <p class="text-outline-variant italic" id="placeholder">Translation will appear here...</p>
+        <!-- Thinking indicator -->
+        <div id="thinkingDots" class="hidden flex gap-xs items-center mt-sm">
+          <span class="thinking-dot w-2 h-2 bg-secondary rounded-full inline-block"></span>
+          <span class="thinking-dot w-2 h-2 bg-secondary rounded-full inline-block"></span>
+          <span class="thinking-dot w-2 h-2 bg-secondary rounded-full inline-block"></span>
+        </div>
+        <!-- Translation result -->
+        <p id="translationResult" class="hidden text-on-surface"></p>
+        <!-- Confidence badge -->
+        <div id="confidenceBadge" class="hidden mt-sm">
+          <span class="text-[11px] font-semibold text-secondary bg-secondary-container px-sm py-xs rounded-full" id="confidenceText"></span>
+        </div>
+        <!-- RAG context -->
+        <div id="ragContext" class="hidden mt-md p-sm bg-surface-container-low rounded-lg border border-outline-variant/30">
+          <p class="text-[11px] font-semibold text-on-surface-variant uppercase tracking-widest mb-xs">Memory Context Used</p>
+          <div id="ragContextItems" class="text-[13px] text-on-surface-variant space-y-xs"></div>
+        </div>
+      </div>
+      <div class="mt-md flex justify-between items-center border-t border-outline-variant pt-md">
+        <div class="flex gap-sm">
+          <button onclick="shareTranslation()" class="p-xs text-outline hover:text-primary transition">
+            <span class="material-symbols-outlined">share</span>
+          </button>
+          <button onclick="speakTranslation()" class="p-xs text-outline hover:text-primary transition">
+            <span class="material-symbols-outlined">volume_up</span>
+          </button>
+        </div>
+        <button onclick="openDictionary()" class="text-secondary text-[13px] font-semibold hover:underline">Dictionary</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick examples -->
+  <section class="mt-md">
+    <p class="text-[11px] font-semibold text-on-surface-variant uppercase tracking-widest mb-sm">Try these examples</p>
+    <div class="flex flex-wrap gap-sm" id="examplesContainer">
+      <!-- populated by JS -->
+    </div>
+  </section>
+
+  <!-- Linguistic tools -->
+  <section class="grid grid-cols-1 md:grid-cols-3 gap-md mt-md">
+    <a href="#" class="bg-surface-container-low p-md rounded-xl border border-outline-variant hover:bg-surface-container transition cursor-pointer group">
+      <div class="flex items-center gap-sm mb-xs">
+        <span class="material-symbols-outlined text-on-surface-variant">menu_book</span>
+        <h3 class="font-semibold text-primary text-[16px]">Dictionary</h3>
+      </div>
+      <p class="text-[14px] text-on-surface-variant">Explore Runyoro word roots, etymology, and glossary.</p>
+    </a>
+    <a href="#" class="bg-surface-container-low p-md rounded-xl border border-outline-variant hover:bg-surface-container transition cursor-pointer group">
+      <div class="flex items-center gap-sm mb-xs">
+        <span class="material-symbols-outlined text-on-surface-variant">construction</span>
+        <h3 class="font-semibold text-primary text-[16px]">Linguistic Tools</h3>
+      </div>
+      <p class="text-[14px] text-on-surface-variant">Grammar structure, noun class analysis, verb morphology.</p>
+    </a>
+    <a href="reports.html" class="bg-surface-container-low p-md rounded-xl border border-outline-variant hover:bg-surface-container transition cursor-pointer group">
+      <div class="flex items-center gap-sm mb-xs">
+        <span class="material-symbols-outlined text-on-surface-variant">analytics</span>
+        <h3 class="font-semibold text-primary text-[16px]">Quality Reports</h3>
+      </div>
+      <p class="text-[14px] text-on-surface-variant">BLEU, chrF++, COMET, error analysis and pipeline stats.</p>
+    </a>
+  </section>
+
+</main>
+
+<!-- BOTTOM NAV -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-gutter py-md bg-surface-container-lowest shadow-[0_-8px_24px_rgba(7,2,53,0.08)] z-50 rounded-t-xl">
+  <a href="index.html" class="text-on-surface-variant flex flex-col items-center gap-xs text-[11px] font-semibold opacity-70 hover:opacity-100 px-lg py-xs rounded-xl transition active:scale-90">
+    <span class="material-symbols-outlined">home</span>Home
+  </a>
+  <a href="translator.html" class="bg-secondary-container text-on-secondary-container rounded-full px-lg py-xs flex flex-col items-center gap-xs text-[11px] font-semibold active:scale-90 transition">
+    <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">translate</span>Translate
+  </a>
+  <a href="pipeline.html" class="text-on-surface-variant flex flex-col items-center gap-xs text-[11px] font-semibold opacity-70 hover:opacity-100 px-lg py-xs rounded-xl transition active:scale-90">
+    <span class="material-symbols-outlined">schema</span>Pipeline
+  </a>
+  <a href="reports.html" class="text-on-surface-variant flex flex-col items-center gap-xs text-[11px] font-semibold opacity-70 hover:opacity-100 px-lg py-xs rounded-xl transition active:scale-90">
+    <span class="material-symbols-outlined">analytics</span>Reports
+  </a>
+</nav>
+
+<!-- Background decoration -->
+<div class="fixed inset-0 -z-10 opacity-20 pointer-events-none">
+  <div class="absolute top-1/4 -left-20 w-80 h-80 bg-secondary-fixed-dim rounded-full blur-[120px]"></div>
+  <div class="absolute bottom-1/4 -right-20 w-96 h-96 bg-primary-fixed rounded-full blur-[140px]"></div>
+</div>
+
+<script>
+  // -----------------------------------------------------------------------
+  // State
+  // -----------------------------------------------------------------------
+  let direction = 'rny_en';  // 'rny_en' or 'en_rny'
+  const API_URL = 'http://localhost:8000/translate';
+  let useAPI = false;  // set true when API server is running
+
+  const EXAMPLES_RNY = [
+    "Oraire ota?",
+    "Webale muno kunkonyera.",
+    "Eizooba nirirasa ha nsozi.",
+    "Abantu boona baine obugabe.",
+    "Ensigo za'obulo zikolwa mukiseera kya kugwa.",
+  ];
+  const EXAMPLES_EN = [
+    "How are you?",
+    "The sun is rising over the mountains.",
+    "Thank you very much for your help.",
+    "All people have equal dignity.",
+    "Millet seeds are planted during the planting season.",
+  ];
+
+  // Static demo translations (offline mode — replace with real API when deployed)
+  const DEMO_TRANSLATIONS = {
+    "oraire ota?": "How are you? / Good morning!",
+    "webale muno kunkonyera.": "Thank you very much for helping me.",
+    "eizooba nirirasa ha nsozi.": "The sun is rising over the mountains.",
+    "abantu boona baine obugabe.": "All people have equal dignity.",
+    "how are you?": "Oraire ota?",
+    "thank you very much for your help.": "Webale nyo okunkonyera.",
+    "the sun is rising over the mountains.": "Eizooba nirirasa ha nsozi.",
+    "all people have equal dignity.": "Abantu boona baine obugabe.",
+  };
+
+  // -----------------------------------------------------------------------
+  // Direction
+  // -----------------------------------------------------------------------
+  function setDirection(dir) {
+    direction = dir;
+    const rnyBtn = document.getElementById('btn-rny-en');
+    const enBtn = document.getElementById('btn-en-rny');
+    const srcLabel = document.getElementById('srcLabel');
+    const tgtLabel = document.getElementById('tgtLabel');
+
+    if (dir === 'rny_en') {
+      rnyBtn.className = 'px-md py-xs rounded-full bg-secondary-container text-on-secondary-container text-[13px] font-semibold transition active:scale-90';
+      enBtn.className = 'px-md py-xs rounded-full bg-surface-container text-on-surface-variant text-[13px] font-semibold transition active:scale-90';
+      srcLabel.textContent = 'RUNYORO-RUTOORO';
+      tgtLabel.textContent = 'ENGLISH';
+    } else {
+      enBtn.className = 'px-md py-xs rounded-full bg-secondary-container text-on-secondary-container text-[13px] font-semibold transition active:scale-90';
+      rnyBtn.className = 'px-md py-xs rounded-full bg-surface-container text-on-surface-variant text-[13px] font-semibold transition active:scale-90';
+      srcLabel.textContent = 'ENGLISH';
+      tgtLabel.textContent = 'RUNYORO-RUTOORO';
+    }
+    loadExamples();
+    clearOutput();
+  }
+
+  function swapLanguages() {
+    const current = document.getElementById('sourceText').value;
+    const translated = document.getElementById('translationResult').textContent;
+    setDirection(direction === 'rny_en' ? 'en_rny' : 'rny_en');
+    if (translated && translated !== '') {
+      document.getElementById('sourceText').value = translated;
+      onSourceInput();
+    }
+    // Animate swap icon
+    const icon = document.getElementById('swapIcon');
+    icon.style.transform = 'rotate(180deg)';
+    setTimeout(() => { icon.style.transform = ''; }, 300);
+  }
+
+  // -----------------------------------------------------------------------
+  // Examples
+  // -----------------------------------------------------------------------
+  function loadExamples() {
+    const container = document.getElementById('examplesContainer');
+    const examples = direction === 'rny_en' ? EXAMPLES_RNY : EXAMPLES_EN;
+    container.innerHTML = '';
+    examples.forEach(ex => {
+      const btn = document.createElement('button');
+      btn.className = 'px-md py-xs bg-surface-container-lowest border border-outline-variant rounded-full text-[13px] text-on-surface-variant hover:bg-surface-container transition active:scale-90';
+      btn.textContent = ex;
+      btn.onclick = () => {
+        document.getElementById('sourceText').value = ex;
+        onSourceInput();
+        doTranslate();
+      };
+      container.appendChild(btn);
+    });
+  }
+
+  // -----------------------------------------------------------------------
+  // Input handling
+  // -----------------------------------------------------------------------
+  function onSourceInput() {
+    const text = document.getElementById('sourceText').value;
+    document.getElementById('charCount').textContent = `${text.length} / 5000`;
+    clearOutput();
+  }
+
+  function clearSource() {
+    document.getElementById('sourceText').value = '';
+    document.getElementById('charCount').textContent = '0 / 5000';
+    clearOutput();
+  }
+
+  function clearOutput() {
+    document.getElementById('placeholder').classList.remove('hidden');
+    document.getElementById('translationResult').classList.add('hidden');
+    document.getElementById('translationResult').textContent = '';
+    document.getElementById('confidenceBadge').classList.add('hidden');
+    document.getElementById('ragContext').classList.add('hidden');
+    document.getElementById('thinkingDots').classList.add('hidden');
+  }
+
+  // -----------------------------------------------------------------------
+  // Translation
+  // -----------------------------------------------------------------------
+  async function doTranslate() {
+    const text = document.getElementById('sourceText').value.trim();
+    if (!text) return;
+
+    // Show thinking
+    document.getElementById('progressBar').classList.remove('opacity-0');
+    document.getElementById('placeholder').classList.add('hidden');
+    document.getElementById('translationResult').classList.add('hidden');
+    document.getElementById('thinkingDots').classList.remove('hidden');
+
+    let result = null;
+
+    if (useAPI) {
+      try {
+        const resp = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            text: text,
+            direction: direction === 'rny_en' ? 'rny_to_en' : 'en_to_rny',
+            return_confidence: true,
+          }),
+        });
+        result = await resp.json();
+      } catch (e) {
+        console.warn('API unavailable, using demo mode:', e);
+      }
+    }
+
+    // Offline demo mode
+    if (!result) {
+      await new Promise(r => setTimeout(r, 800));  // simulate latency
+      const key = text.toLowerCase().replace(/\s+/g, ' ').trim();
+      const demo = DEMO_TRANSLATIONS[key] || `[Demo mode — connect API at ${API_URL} for real translations]`;
+      result = { translation: demo, confidence: null };
+    }
+
+    // Display
+    document.getElementById('thinkingDots').classList.add('hidden');
+    const resultEl = document.getElementById('translationResult');
+    resultEl.textContent = result.translation;
+    resultEl.classList.remove('hidden');
+    document.getElementById('progressBar').classList.add('opacity-0');
+
+    if (result.confidence) {
+      document.getElementById('confidenceText').textContent = `Confidence: ${(result.confidence * 100).toFixed(0)}%`;
+      document.getElementById('confidenceBadge').classList.remove('hidden');
+    }
+
+    if (result.rag_context && result.rag_context.length > 0) {
+      const itemsEl = document.getElementById('ragContextItems');
+      itemsEl.innerHTML = result.rag_context.slice(0, 2).map(ctx =>
+        `<div class="flex gap-sm"><span class="text-secondary font-semibold">${ctx.similarity.toFixed(2)}</span> <span>${ctx.runyoro} → ${ctx.english}</span></div>`
+      ).join('');
+      document.getElementById('ragContext').classList.remove('hidden');
+    }
+  }
+
+  // -----------------------------------------------------------------------
+  // Utility
+  // -----------------------------------------------------------------------
+  function copyTranslation() {
+    const text = document.getElementById('translationResult').textContent;
+    if (text) navigator.clipboard.writeText(text).catch(() => {});
+  }
+
+  function savePhrase() {
+    const icon = document.getElementById('starIcon');
+    icon.style.fontVariationSettings = "'FILL' 1";
+    icon.style.color = '#006a61';
+    setTimeout(() => {
+      icon.style.fontVariationSettings = "'FILL' 0";
+      icon.style.color = '';
+    }, 2000);
+  }
+
+  function shareTranslation() {
+    const text = document.getElementById('translationResult').textContent;
+    if (navigator.share && text) {
+      navigator.share({ title: 'AI Stick Translation', text });
+    }
+  }
+
+  function speakSource() {
+    const text = document.getElementById('sourceText').value;
+    if (text && 'speechSynthesis' in window) {
+      const utt = new SpeechSynthesisUtterance(text);
+      window.speechSynthesis.speak(utt);
+    }
+  }
+
+  function speakTranslation() {
+    const text = document.getElementById('translationResult').textContent;
+    if (text && 'speechSynthesis' in window) {
+      const utt = new SpeechSynthesisUtterance(text);
+      utt.lang = direction === 'rny_en' ? 'en-US' : 'en-UG';
+      window.speechSynthesis.speak(utt);
+    }
+  }
+
+  function openDictionary() {
+    alert('Dictionary feature — connect to /glossary API endpoint');
+  }
+
+  // -----------------------------------------------------------------------
+  // Init
+  // -----------------------------------------------------------------------
+  loadExamples();
+</script>
+</body>
+</html>

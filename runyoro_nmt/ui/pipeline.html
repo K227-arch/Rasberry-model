@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>AI Stick — Pipeline Diagram</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script>
+    tailwind.config={theme:{extend:{colors:{
+      "background":"#f7f9fb","surface":"#f7f9fb","surface-container":"#eceef0",
+      "surface-container-lowest":"#ffffff","surface-container-low":"#f2f4f6",
+      "on-surface":"#191c1e","on-surface-variant":"#47464f","outline-variant":"#c8c5d0",
+      "outline":"#787680","primary":"#070235","on-primary":"#ffffff",
+      "primary-container":"#1e1b4b","on-primary-container":"#8683ba",
+      "primary-fixed":"#e3dfff","on-primary-fixed-variant":"#444173",
+      "secondary":"#006a61","on-secondary":"#ffffff",
+      "secondary-container":"#86f2e4","on-secondary-container":"#006f66",
+      "secondary-fixed":"#89f5e7","on-secondary-fixed-variant":"#005049",
+      "error":"#ba1a1a",
+    },spacing:{"lg":"24px","xl":"40px","sm":"12px","xs":"4px","base":"8px","md":"16px","gutter":"16px","margin":"20px"}}}}
+  </script>
+  <style>
+    .material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;}
+    body{font-family:'Inter',sans-serif;background:#f7f9fb;}
+    .flow-arrow{color:#006a61;font-size:24px;text-align:center;line-height:1;}
+    .stage-node{transition:all .2s;}
+    .stage-node:hover{transform:scale(1.02);box-shadow:0 8px 32px rgba(7,2,53,.12);}
+  </style>
+</head>
+<body class="min-h-screen pb-32 text-on-background">
+
+<header class="bg-surface sticky top-0 z-40 shadow-sm">
+  <div class="flex items-center gap-md w-full px-margin py-base max-w-screen-xl mx-auto">
+    <a href="index.html" class="p-xs rounded-full hover:bg-surface-container transition">
+      <span class="material-symbols-outlined text-primary">arrow_back</span>
+    </a>
+    <h1 class="font-bold text-[22px] text-primary">runyoro-nmt-v1 Pipeline</h1>
+  </div>
+</header>
+
+<main class="max-w-3xl mx-auto px-margin py-lg">
+
+  <!-- Legend -->
+  <div class="flex gap-md mb-lg flex-wrap">
+    <div class="flex items-center gap-xs text-[13px]"><div class="w-3 h-3 rounded-full bg-secondary-container"></div> Data</div>
+    <div class="flex items-center gap-xs text-[13px]"><div class="w-3 h-3 rounded-full bg-primary-fixed"></div> Training</div>
+    <div class="flex items-center gap-xs text-[13px]"><div class="w-3 h-3 rounded-full bg-primary-container"></div> Evaluation</div>
+    <div class="flex items-center gap-xs text-[13px]"><div class="w-3 h-3 rounded-full bg-secondary-fixed"></div> Deployment</div>
+  </div>
+
+  <!-- Input -->
+  <div class="stage-node bg-primary text-white rounded-xl p-md mb-xs shadow-md">
+    <div class="flex items-center gap-sm">
+      <span class="material-symbols-outlined">folder_open</span>
+      <div>
+        <p class="font-semibold">Raw Data Input</p>
+        <p class="text-[12px] opacity-70">.xlsx × 2, .docx × 6 — raw data/ directory</p>
+      </div>
+    </div>
+  </div>
+  <div class="flow-arrow py-xs">↓</div>
+
+  <!-- Stage 1 -->
+  <div class="stage-node bg-secondary-container rounded-xl p-md mb-xs shadow-sm border border-outline-variant/10">
+    <div class="flex items-center gap-sm">
+      <span class="material-symbols-outlined text-secondary">table_chart</span>
+      <div>
+        <p class="font-semibold text-primary">1. Extraction</p>
+        <p class="text-[12px] text-on-secondary-container">Auto-detect Runyoro/English columns → flat (rny, en) pair list</p>
+      </div>
+    </div>
+  </div>
+  <div class="flow-arrow py-xs">↓</div>
+
+  <!-- Stage 2 -->
+  <div class="stage-node bg-secondary-container rounded-xl p-md mb-xs shadow-sm border border-outline-variant/10">
+    <div class="flex items-center gap-sm">
+      <span class="material-symbols-outlined text-secondary">verified</span>
+      <div>
+        <p class="font-semibold text-primary">2. Validation & QA</p>
+        <p class="text-[12px] text-on-secondary-container">Length filters · language ID · misalignment · ortho checks · dedup</p>
+      </div>
+    </div>
+  </div>
+  <div class="flow-arrow py-xs">↓</div>
+
+  <!-- Stage 3 -->
+  <div class="stage-node bg-secondary-container rounded-xl p-md mb-xs shadow-sm border border-outline-variant/10">
+    <div class="flex items-center gap-sm">
+      <span class="material-symbols-outlined text-secondary">link</span>
+      <div>
+        <p class="font-semibold text-primary">3. Alignment Check</p>
+        <p class="text-[12px] text-on-secondary-container">TF-IDF cosine · shared token · semantic similarity scores</p>
+      </div>
+    </div>
+  </div>
+  <div class="flow-arrow py-xs">↓</div>
+
+  <!-- Stage 4 -->
+  <div class="stage-node bg-secondary-container rounded-xl p-md mb-xs shadow-sm border border-outline-variant/10">
+    <div class="flex items-center gap-sm">
+      <span class="material-symbols-outlined text-secondary">cleaning_services</span>
+      <div>
+        <p class="font-semibold text-primary">4. Cleaning & Normalisation</p>
+        <p class="text-[12px] text-on-secondary-container">Unicode NFC · HTML · quotes · Runyoro corrections · English capitalisation</p>
+      </div>
+    </div>
+  </div>
+  <div class="flow-arrow py-xs">↓</div>
+
+  <!-- Stage 5 -->
+  <div class="stage-node bg-primary-fixed rounded-xl p-md mb-xs shadow-sm border border-outline-variant/10">
+    <div class="flex items-center gap-sm">
+      <span class="material-symbols-outlined text-on-primary-fixed-variant">library_books</span>
+      <div>
+        <p class="font-semibold text-primary">5. Linguistic Resources</p>
+        <p class="text-[12px] text-on-surface-variant">TMX · TBX · Glossary CSV/JSON · Named entities · Domain tagging</p>
+      </div>
+    </div>
+  </div>
+  <div class="flow-arrow py-xs">↓</div>
+
+  <!-- Stage 6 -->
+  <div class="stage-node bg-secondary-fixed rounded-xl p-md mb-xs shadow-sm border border-outline-variant/10">
+    <div class="flex items-center gap-sm">
+      <span class="material-symbols-outlined text-on-secondary-fixed-variant">auto_awesome</span>
+      <div>
+        <p class="font-semibold text-primary">6. Data Augmentation</p>
+        <p class="text-[12px] text-on-secondary-fixed-variant">Token deletion · swap · synonym sub · noise · 2× multiplier</p>
+      </div>
+    </div>
+  </div>
+  <div class="flow-arrow py-xs">↓</div>
+
+  <!-- Stage 7 -->
+  <div class="stage-node bg-secondary-fixed rounded-xl p-md mb-xs shadow-sm border border-outline-variant/10">
+    <div class="flex items-center gap-sm">
+      <span class="material-symbols-outlined text-on-secondary-fixed-variant">call_split</span>
+      <div>
+        <p class="font-semibold text-primary">7. Train / Val / Test Split</p>
+        <p class="text-[12px] text-on-secondary-fixed-variant">85% / 10% / 5% · seed=42 · bidirectional (rny→en + en→rny)</p>
+      </div>
+    </div>
+  </div>
+  <div class="flow-arrow py-xs">↓</div>
+
+  <!-- Stage 8 — Training (highlighted) -->
+  <div class="stage-node bg-primary text-white rounded-xl p-md mb-xs shadow-xl">
+    <div class="flex items-center gap-sm">
+      <span class="material-symbols-outlined">model_training</span>
+      <div>
+        <p class="font-semibold text-[16px]">8. NLLB-200 Fine-tuning (runyoro-nmt-v1)</p>
+        <p class="text-[12px] opacity-80">Curriculum learning · Contrastive loss · Domain weighting · Label smoothing</p>
+        <p class="text-[11px] opacity-60 mt-xs">⚠ Separate from existing NLLB checkpoints</p>
+      </div>
+    </div>
+  </div>
+  <div class="flow-arrow py-xs">↓</div>
+
+  <!-- Stage 9 -->
+  <div class="stage-node bg-primary-container rounded-xl p-md mb-xs shadow-sm border border-outline-variant/10">
+    <div class="flex items-center gap-sm">
+      <span class="material-symbols-outlined text-on-primary-container">analytics</span>
+      <div>
+        <p class="font-semibold text-white">9. Evaluation</p>
+        <p class="text-[12px] text-on-primary-container">BLEU · chrF++ · COMET · TER · BERTScore · Back-translation</p>
+      </div>
+    </div>
+  </div>
+  <div class="flow-arrow py-xs">↓</div>
+
+  <!-- Stage 10 -->
+  <div class="stage-node bg-primary-container rounded-xl p-md mb-xs shadow-sm border border-outline-variant/10">
+    <div class="flex items-center gap-sm">
+      <span class="material-symbols-outlined text-on-primary-container">bug_report</span>
+      <div>
+        <p class="font-semibold text-white">10. Error Analysis</p>
+        <p class="text-[12px] text-on-primary-container">Hallucination · untranslated · code-switching · terminology · length</p>
+      </div>
+    </div>
+  </div>
+  <div class="flow-arrow py-xs">↓</div>
+
+  <!-- Stage 11 -->
+  <div class="stage-node bg-secondary-container rounded-xl p-md mb-xs shadow-sm border border-outline-variant/10">
+    <div class="flex items-center gap-sm">
+      <span class="material-symbols-outlined text-secondary">compress</span>
+      <div>
+        <p class="font-semibold text-primary">11. Quantization & Export</p>
+        <p class="text-[12px] text-on-secondary-container">INT8 PyTorch · ONNX · CTranslate2 · Raspberry Pi / edge ready</p>
+      </div>
+    </div>
+  </div>
+  <div class="flow-arrow py-xs">↓</div>
+
+  <!-- Stage 12 -->
+  <div class="stage-node bg-secondary rounded-xl p-md mb-xs shadow-sm">
+    <div class="flex items-center gap-sm">
+      <span class="material-symbols-outlined text-white">cloud_upload</span>
+      <div>
+        <p class="font-semibold text-white">12. Hugging Face Hub Push</p>
+        <p class="text-[12px] text-secondary-container">kathay/runyoro-nmt-v1 · kathay/runyoro-rutooro-en-parallel · kathay/runyoro-translator (Space)</p>
+      </div>
+    </div>
+  </div>
+  <div class="flow-arrow py-xs">↓</div>
+
+  <!-- Output -->
+  <div class="stage-node bg-primary text-white rounded-xl p-md shadow-xl">
+    <div class="flex items-center gap-sm">
+      <span class="material-symbols-outlined">rocket_launch</span>
+      <div>
+        <p class="font-semibold">Production System</p>
+        <p class="text-[12px] opacity-80">REST API + Gradio Space + RAG translator + UI portal</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Retraining loop -->
+  <div class="mt-lg p-md bg-surface-container rounded-xl border border-outline-variant/10">
+    <div class="flex items-center gap-sm mb-sm">
+      <span class="material-symbols-outlined text-secondary">refresh</span>
+      <p class="font-semibold text-primary">Continuous Improvement Loop</p>
+    </div>
+    <p class="text-[13px] text-on-surface-variant">
+      New data → re-run pipeline → compare metrics → retrain if BLEU improves →
+      push updated model to Hub as a new version.
+    </p>
+  </div>
+
+</main>
+
+<!-- BOTTOM NAV -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-gutter py-md bg-surface-container-lowest shadow-[0_-8px_24px_rgba(7,2,53,0.08)] z-50 rounded-t-xl">
+  <a href="index.html" class="text-on-surface-variant flex flex-col items-center gap-xs text-[11px] font-semibold opacity-70 hover:opacity-100 px-lg py-xs rounded-xl transition">
+    <span class="material-symbols-outlined">home</span>Home
+  </a>
+  <a href="translator.html" class="text-on-surface-variant flex flex-col items-center gap-xs text-[11px] font-semibold opacity-70 hover:opacity-100 px-lg py-xs rounded-xl transition">
+    <span class="material-symbols-outlined">translate</span>Translate
+  </a>
+  <a href="pipeline.html" class="bg-secondary-container text-on-secondary-container rounded-full px-lg py-xs flex flex-col items-center gap-xs text-[11px] font-semibold active:scale-90 transition">
+    <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">schema</span>Pipeline
+  </a>
+  <a href="reports.html" class="text-on-surface-variant flex flex-col items-center gap-xs text-[11px] font-semibold opacity-70 hover:opacity-100 px-lg py-xs rounded-xl transition">
+    <span class="material-symbols-outlined">analytics</span>Reports
+  </a>
+</nav>
+
+</body>
+</html>

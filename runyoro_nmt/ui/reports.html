@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>AI Stick — Pipeline Reports</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script>
+    tailwind.config = {
+      theme:{extend:{
+        colors:{
+          "on-background":"#191c1e","surface-container-high":"#e6e8ea",
+          "primary-fixed":"#e3dfff","on-surface":"#191c1e",
+          "on-primary-container":"#8683ba","secondary-fixed":"#89f5e7",
+          "surface-container-low":"#f2f4f6","background":"#f7f9fb",
+          "on-primary-fixed":"#181445","on-secondary-fixed-variant":"#005049",
+          "secondary-fixed-dim":"#6bd8cb","on-secondary-container":"#006f66",
+          "on-primary-fixed-variant":"#444173","outline-variant":"#c8c5d0",
+          "surface":"#f7f9fb","surface-container":"#eceef0",
+          "secondary":"#006a61","surface-container-highest":"#e0e3e5",
+          "secondary-container":"#86f2e4","outline":"#787680",
+          "surface-container-lowest":"#ffffff","on-primary":"#ffffff",
+          "primary":"#070235","error":"#ba1a1a","on-secondary":"#ffffff",
+          "on-surface-variant":"#47464f","primary-container":"#1e1b4b",
+        },
+        spacing:{"lg":"24px","xl":"40px","sm":"12px","xs":"4px","base":"8px","md":"16px","gutter":"16px","margin":"20px"}
+      }}
+    }
+  </script>
+  <style>
+    .material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;}
+    body{font-family:'Inter',sans-serif;background:#f7f9fb;}
+    .metric-bar{transition:width 1s ease;}
+  </style>
+</head>
+<body class="text-on-background min-h-screen pb-32">
+
+<!-- TOP APP BAR -->
+<header class="bg-surface sticky top-0 z-40 shadow-sm">
+  <div class="flex justify-between items-center w-full px-margin py-base max-w-screen-xl mx-auto">
+    <div class="flex items-center gap-md">
+      <a href="index.html" class="p-xs rounded-full hover:bg-surface-container transition">
+        <span class="material-symbols-outlined text-primary">arrow_back</span>
+      </a>
+      <h1 class="font-bold text-[22px] text-primary">Pipeline Reports</h1>
+    </div>
+    <span class="text-[13px] text-on-surface-variant">runyoro-nmt-v1</span>
+  </div>
+</header>
+
+<main class="max-w-screen-xl mx-auto px-margin py-lg">
+
+  <!-- Report tabs -->
+  <div class="flex gap-sm mb-lg overflow-x-auto pb-xs">
+    <button onclick="showTab('overview')" id="tab-overview"
+      class="px-md py-xs rounded-full bg-secondary-container text-on-secondary-container text-[13px] font-semibold whitespace-nowrap active:scale-90 transition">
+      Overview
+    </button>
+    <button onclick="showTab('data')" id="tab-data"
+      class="px-md py-xs rounded-full bg-surface-container text-on-surface-variant text-[13px] font-semibold whitespace-nowrap active:scale-90 transition">
+      Data Quality
+    </button>
+    <button onclick="showTab('eval')" id="tab-eval"
+      class="px-md py-xs rounded-full bg-surface-container text-on-surface-variant text-[13px] font-semibold whitespace-nowrap active:scale-90 transition">
+      Evaluation
+    </button>
+    <button onclick="showTab('errors')" id="tab-errors"
+      class="px-md py-xs rounded-full bg-surface-container text-on-surface-variant text-[13px] font-semibold whitespace-nowrap active:scale-90 transition">
+      Error Analysis
+    </button>
+    <button onclick="showTab('linguistic')" id="tab-linguistic"
+      class="px-md py-xs rounded-full bg-surface-container text-on-surface-variant text-[13px] font-semibold whitespace-nowrap active:scale-90 transition">
+      Linguistic
+    </button>
+  </div>
+
+  <!-- Overview tab -->
+  <div id="pane-overview">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-md mb-lg">
+      <div class="bg-primary rounded-xl p-lg text-white">
+        <span class="material-symbols-outlined text-[32px] opacity-80">model_training</span>
+        <p class="text-[13px] font-semibold opacity-70 uppercase tracking-widest mt-sm">Model</p>
+        <p class="text-[22px] font-bold">runyoro-nmt-v1</p>
+        <p class="text-[13px] opacity-70">Based on NLLB-200 600M</p>
+      </div>
+      <div class="bg-secondary rounded-xl p-lg text-white">
+        <span class="material-symbols-outlined text-[32px] opacity-80">translate</span>
+        <p class="text-[13px] font-semibold opacity-70 uppercase tracking-widest mt-sm">Direction</p>
+        <p class="text-[22px] font-bold">Bidirectional</p>
+        <p class="text-[13px] opacity-70">Runyoro-Rutooro ↔ English</p>
+      </div>
+      <div class="bg-surface-container-lowest rounded-xl p-lg border border-outline-variant/10">
+        <span class="material-symbols-outlined text-secondary text-[32px]">hub</span>
+        <p class="text-[13px] font-semibold text-on-surface-variant uppercase tracking-widest mt-sm">Hub ID</p>
+        <p class="text-[18px] font-bold text-primary">kathay/runyoro-nmt-v1</p>
+        <a href="https://huggingface.co/kathay/runyoro-nmt-v1" target="_blank"
+           class="text-[13px] text-secondary hover:underline">View on HF Hub →</a>
+      </div>
+    </div>
+
+    <!-- Pipeline summary -->
+    <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/10 overflow-hidden mb-lg">
+      <div class="p-md border-b border-outline-variant/10 bg-surface-container-low">
+        <p class="font-semibold text-primary">Pipeline Stage Status</p>
+      </div>
+      <div class="divide-y divide-outline-variant/10" id="stageList">
+        <!-- populated by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Data Quality tab -->
+  <div id="pane-data" class="hidden">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-md mb-lg">
+      <div class="bg-surface-container-lowest rounded-xl p-md border border-outline-variant/10 text-center shadow-sm">
+        <p class="text-[28px] font-bold text-secondary" id="stat-raw">—</p>
+        <p class="text-[13px] text-on-surface-variant font-semibold">Raw Pairs</p>
+      </div>
+      <div class="bg-surface-container-lowest rounded-xl p-md border border-outline-variant/10 text-center shadow-sm">
+        <p class="text-[28px] font-bold text-secondary" id="stat-valid">—</p>
+        <p class="text-[13px] text-on-surface-variant font-semibold">Valid Pairs</p>
+      </div>
+      <div class="bg-surface-container-lowest rounded-xl p-md border border-outline-variant/10 text-center shadow-sm">
+        <p class="text-[28px] font-bold text-error" id="stat-rejected">—</p>
+        <p class="text-[13px] text-on-surface-variant font-semibold">Rejected</p>
+      </div>
+      <div class="bg-surface-container-lowest rounded-xl p-md border border-outline-variant/10 text-center shadow-sm">
+        <p class="text-[28px] font-bold text-secondary" id="stat-augmented">—</p>
+        <p class="text-[13px] text-on-surface-variant font-semibold">After Augmentation</p>
+      </div>
+    </div>
+    <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/10 p-lg">
+      <p class="font-semibold text-primary mb-md">Run pipeline to see data quality statistics.</p>
+      <code class="block bg-surface-container p-md rounded-lg text-[13px] text-on-surface-variant">
+        python scripts/run_pipeline.py --config configs/config.yaml --data-only
+      </code>
+    </div>
+  </div>
+
+  <!-- Evaluation tab -->
+  <div id="pane-eval" class="hidden">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-md mb-lg">
+      <!-- Metrics -->
+      <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/10 p-lg">
+        <h3 class="font-semibold text-primary mb-md">Automatic Metrics (Runyoro → English)</h3>
+        <div class="space-y-md">
+          <div>
+            <div class="flex justify-between text-[13px] font-semibold mb-xs">
+              <span class="text-on-surface-variant">BLEU</span>
+              <span class="text-secondary" id="bleu-score">—</span>
+            </div>
+            <div class="w-full h-2 bg-surface-container rounded-full overflow-hidden">
+              <div class="metric-bar h-full bg-secondary rounded-full" style="width:0%" id="bleu-bar"></div>
+            </div>
+          </div>
+          <div>
+            <div class="flex justify-between text-[13px] font-semibold mb-xs">
+              <span class="text-on-surface-variant">chrF++</span>
+              <span class="text-secondary" id="chrf-score">—</span>
+            </div>
+            <div class="w-full h-2 bg-surface-container rounded-full overflow-hidden">
+              <div class="metric-bar h-full bg-secondary rounded-full" style="width:0%" id="chrf-bar"></div>
+            </div>
+          </div>
+          <div>
+            <div class="flex justify-between text-[13px] font-semibold mb-xs">
+              <span class="text-on-surface-variant">BERTScore F1</span>
+              <span class="text-secondary" id="bert-score">—</span>
+            </div>
+            <div class="w-full h-2 bg-surface-container rounded-full overflow-hidden">
+              <div class="metric-bar h-full bg-secondary rounded-full" style="width:0%" id="bert-bar"></div>
+            </div>
+          </div>
+          <div>
+            <div class="flex justify-between text-[13px] font-semibold mb-xs">
+              <span class="text-on-surface-variant">COMET</span>
+              <span class="text-secondary" id="comet-score">—</span>
+            </div>
+            <div class="w-full h-2 bg-surface-container rounded-full overflow-hidden">
+              <div class="metric-bar h-full bg-secondary rounded-full" style="width:0%" id="comet-bar"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Human eval -->
+      <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/10 p-lg">
+        <h3 class="font-semibold text-primary mb-md">Human Evaluation Criteria</h3>
+        <div class="space-y-sm text-[14px] text-on-surface-variant">
+          <div class="flex items-center gap-sm"><span class="material-symbols-outlined text-secondary text-[20px]">check_circle</span> Fluency — naturalness of output</div>
+          <div class="flex items-center gap-sm"><span class="material-symbols-outlined text-secondary text-[20px]">check_circle</span> Adequacy — meaning preservation</div>
+          <div class="flex items-center gap-sm"><span class="material-symbols-outlined text-secondary text-[20px]">check_circle</span> Terminology — correct domain terms</div>
+          <div class="flex items-center gap-sm"><span class="material-symbols-outlined text-secondary text-[20px]">check_circle</span> Cultural appropriateness</div>
+          <div class="flex items-center gap-sm"><span class="material-symbols-outlined text-secondary text-[20px]">check_circle</span> Named entity accuracy</div>
+        </div>
+        <div class="mt-md p-sm bg-surface-container rounded-lg text-[13px] text-on-surface-variant">
+          Human evaluation requires native Runyoro-Rutooro speakers. Enable in config.yaml.
+        </div>
+      </div>
+    </div>
+    <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/10 p-lg">
+      <p class="font-semibold text-primary mb-sm">Run full evaluation</p>
+      <code class="block bg-surface-container p-md rounded-lg text-[13px] text-on-surface-variant">
+        python scripts/run_pipeline.py --config configs/config.yaml --skip-training
+      </code>
+    </div>
+  </div>
+
+  <!-- Error Analysis tab -->
+  <div id="pane-errors" class="hidden">
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-md mb-lg">
+      <div class="bg-error/10 border border-error/20 rounded-xl p-md text-center">
+        <p class="text-[28px] font-bold text-error">—</p>
+        <p class="text-[13px] font-semibold text-error">Critical Errors</p>
+      </div>
+      <div class="bg-primary-fixed rounded-xl p-md text-center">
+        <p class="text-[28px] font-bold text-on-primary-fixed-variant">—</p>
+        <p class="text-[13px] font-semibold text-on-primary-fixed-variant">Major Errors</p>
+      </div>
+      <div class="bg-surface-container rounded-xl p-md text-center">
+        <p class="text-[28px] font-bold text-on-surface-variant">—</p>
+        <p class="text-[13px] font-semibold text-on-surface-variant">Minor Errors</p>
+      </div>
+    </div>
+    <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/10 p-lg">
+      <h3 class="font-semibold text-primary mb-md">Error Categories Detected</h3>
+      <div class="space-y-sm">
+        <div class="flex items-center gap-sm p-sm bg-surface-container rounded-lg">
+          <span class="material-symbols-outlined text-error">warning</span>
+          <div>
+            <p class="font-semibold text-[14px] text-primary">Hallucination</p>
+            <p class="text-[13px] text-on-surface-variant">Output significantly longer than source — possible fabricated content</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-sm p-sm bg-surface-container rounded-lg">
+          <span class="material-symbols-outlined text-error">swap_vert</span>
+          <div>
+            <p class="font-semibold text-[14px] text-primary">Untranslated Output</p>
+            <p class="text-[13px] text-on-surface-variant">Output identical to source — translation failure</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-sm p-sm bg-surface-container rounded-lg">
+          <span class="material-symbols-outlined text-on-primary-fixed-variant">language</span>
+          <div>
+            <p class="font-semibold text-[14px] text-primary">Code-Switching</p>
+            <p class="text-[13px] text-on-surface-variant">Mixed languages in output</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-sm p-sm bg-surface-container rounded-lg">
+          <span class="material-symbols-outlined text-on-primary-fixed-variant">spellcheck</span>
+          <div>
+            <p class="font-semibold text-[14px] text-primary">Terminology</p>
+            <p class="text-[13px] text-on-surface-variant">Wrong glossary term used for domain-specific vocabulary</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Linguistic tab -->
+  <div id="pane-linguistic" class="hidden">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-md mb-lg">
+      <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/10 p-lg">
+        <h3 class="font-semibold text-primary mb-md">Linguistic Resources Generated</h3>
+        <div class="space-y-sm text-[14px]">
+          <div class="flex items-center gap-sm"><span class="material-symbols-outlined text-secondary text-[18px]">description</span>
+            <span>Translation Memory <code class="text-[12px] bg-surface-container px-xs rounded">runyoro_en.tmx</code></span>
+          </div>
+          <div class="flex items-center gap-sm"><span class="material-symbols-outlined text-secondary text-[18px]">book</span>
+            <span>Terminology Database <code class="text-[12px] bg-surface-container px-xs rounded">runyoro_en.tbx</code></span>
+          </div>
+          <div class="flex items-center gap-sm"><span class="material-symbols-outlined text-secondary text-[18px]">table_chart</span>
+            <span>Bilingual Glossary <code class="text-[12px] bg-surface-container px-xs rounded">glossary.csv / .json</code></span>
+          </div>
+          <div class="flex items-center gap-sm"><span class="material-symbols-outlined text-secondary text-[18px]">person</span>
+            <span>Named Entity Registry <code class="text-[12px] bg-surface-container px-xs rounded">named_entities.json</code></span>
+          </div>
+        </div>
+      </div>
+      <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/10 p-lg">
+        <h3 class="font-semibold text-primary mb-md">Language Rules Enforced</h3>
+        <div class="space-y-sm text-[13px] text-on-surface-variant">
+          <p><strong class="text-primary">Runyoro-Rutooro:</strong> Bantu noun class prefixes (eki-, ebi-, oku-, obu-...), verb morphology, double vowel normalisation, capitalisation rules</p>
+          <p><strong class="text-primary">English:</strong> Sentence-initial capitalisation, punctuation spacing, repeated punctuation removal, HTML entity decoding</p>
+          <p><strong class="text-primary">Cross-lingual:</strong> Code-switching detection, misalignment flags, named entity preservation</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- BOTTOM NAV -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-gutter py-md bg-surface-container-lowest shadow-[0_-8px_24px_rgba(7,2,53,0.08)] z-50 rounded-t-xl">
+  <a href="index.html" class="text-on-surface-variant flex flex-col items-center gap-xs text-[11px] font-semibold opacity-70 hover:opacity-100 px-lg py-xs rounded-xl transition">
+    <span class="material-symbols-outlined">home</span>Home
+  </a>
+  <a href="translator.html" class="text-on-surface-variant flex flex-col items-center gap-xs text-[11px] font-semibold opacity-70 hover:opacity-100 px-lg py-xs rounded-xl transition">
+    <span class="material-symbols-outlined">translate</span>Translate
+  </a>
+  <a href="pipeline.html" class="text-on-surface-variant flex flex-col items-center gap-xs text-[11px] font-semibold opacity-70 hover:opacity-100 px-lg py-xs rounded-xl transition">
+    <span class="material-symbols-outlined">schema</span>Pipeline
+  </a>
+  <a href="reports.html" class="bg-secondary-container text-on-secondary-container rounded-full px-lg py-xs flex flex-col items-center gap-xs text-[11px] font-semibold active:scale-90 transition">
+    <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">analytics</span>Reports
+  </a>
+</nav>
+
+<script>
+  const STAGES = [
+    { name:"Data Extraction", status:"pending", icon:"folder_open" },
+    { name:"Validation & QA", status:"pending", icon:"verified" },
+    { name:"Alignment Check", status:"pending", icon:"link" },
+    { name:"Cleaning & Normalisation", status:"pending", icon:"cleaning_services" },
+    { name:"Linguistic Resources", status:"pending", icon:"library_books" },
+    { name:"Data Augmentation", status:"pending", icon:"auto_awesome" },
+    { name:"Train/Val/Test Split", status:"pending", icon:"call_split" },
+    { name:"Model Training", status:"pending", icon:"model_training" },
+    { name:"Evaluation", status:"pending", icon:"analytics" },
+    { name:"Error Analysis", status:"pending", icon:"bug_report" },
+    { name:"Quantization", status:"pending", icon:"compress" },
+    { name:"Hub Push", status:"pending", icon:"cloud_upload" },
+    { name:"Final Report", status:"pending", icon:"summarize" },
+  ];
+
+  const STATUS_CLASS = {
+    success: "bg-secondary-container text-on-secondary-container",
+    running: "bg-primary-fixed text-on-primary-fixed-variant",
+    pending: "bg-surface-container text-on-surface-variant",
+    error: "bg-error/10 text-error",
+  };
+
+  function renderStages() {
+    const list = document.getElementById('stageList');
+    list.innerHTML = STAGES.map((s, i) => `
+      <div class="p-md flex items-center justify-between hover:bg-surface-container-low transition">
+        <div class="flex items-center gap-md">
+          <div class="h-9 w-9 rounded-lg bg-secondary-container/50 flex items-center justify-center">
+            <span class="material-symbols-outlined text-secondary text-[18px]">${s.icon}</span>
+          </div>
+          <div>
+            <p class="font-semibold text-primary text-[14px]">${i+1}. ${s.name}</p>
+          </div>
+        </div>
+        <span class="${STATUS_CLASS[s.status]} text-[11px] font-semibold px-sm py-xs rounded-full capitalize">${s.status}</span>
+      </div>
+    `).join('');
+  }
+
+  let activeTab = 'overview';
+  function showTab(tab) {
+    document.querySelectorAll('[id^="pane-"]').forEach(p => p.classList.add('hidden'));
+    document.querySelectorAll('[id^="tab-"]').forEach(b => {
+      b.className = 'px-md py-xs rounded-full bg-surface-container text-on-surface-variant text-[13px] font-semibold whitespace-nowrap active:scale-90 transition';
+    });
+    document.getElementById('pane-' + tab).classList.remove('hidden');
+    document.getElementById('tab-' + tab).className =
+      'px-md py-xs rounded-full bg-secondary-container text-on-secondary-container text-[13px] font-semibold whitespace-nowrap active:scale-90 transition';
+  }
+
+  renderStages();
+</script>
+</body>
+</html>

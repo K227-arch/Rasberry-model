@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-background": "#191c1e",
+                        "surface-container-high": "#e6e8ea",
+                        "primary-fixed": "#e3dfff",
+                        "on-surface": "#191c1e",
+                        "on-primary-container": "#8683ba",
+                        "secondary-fixed": "#89f5e7",
+                        "surface-container-low": "#f2f4f6",
+                        "background": "#f7f9fb",
+                        "on-primary-fixed": "#181445",
+                        "on-secondary-fixed-variant": "#005049",
+                        "secondary-fixed-dim": "#6bd8cb",
+                        "on-tertiary-fixed-variant": "#38485d",
+                        "on-secondary-container": "#006f66",
+                        "on-primary-fixed-variant": "#444173",
+                        "outline-variant": "#c8c5d0",
+                        "tertiary": "#000c1d",
+                        "surface": "#f7f9fb",
+                        "on-tertiary-fixed": "#0b1c30",
+                        "surface-container": "#eceef0",
+                        "error-container": "#ffdad6",
+                        "tertiary-container": "#122336",
+                        "secondary": "#006a61",
+                        "surface-container-highest": "#e0e3e5",
+                        "secondary-container": "#86f2e4",
+                        "surface-variant": "#e0e3e5",
+                        "tertiary-fixed-dim": "#b7c8e1",
+                        "surface-tint": "#5b598c",
+                        "on-surface-variant": "#47464f",
+                        "surface-bright": "#f7f9fb",
+                        "on-tertiary-container": "#7a8aa2",
+                        "on-error-container": "#93000a",
+                        "primary-container": "#1e1b4b",
+                        "inverse-surface": "#2d3133",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed": "#d3e4fe",
+                        "outline": "#787680",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "on-secondary-fixed": "#00201d",
+                        "on-error": "#ffffff",
+                        "primary-fixed-dim": "#c4c1fb",
+                        "surface-dim": "#d8dadc",
+                        "on-secondary": "#ffffff",
+                        "inverse-primary": "#c4c1fb",
+                        "primary": "#070235",
+                        "inverse-on-surface": "#eff1f3",
+                        "error": "#ba1a1a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "lg": "24px",
+                        "xl": "40px",
+                        "sm": "12px",
+                        "xs": "4px",
+                        "base": "8px",
+                        "md": "16px",
+                        "gutter": "16px",
+                        "margin": "20px"
+                    },
+                    "fontFamily": {
+                        "h2": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "h1": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "h2": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "label-sm": ["13px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "h1": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "1.5", "letterSpacing": "0", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #f7f9fb;
+            color: #191c1e;
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen pb-32">
+<!-- TopAppBar Component -->
+<header class="bg-surface sticky top-0 z-40 shadow-sm transition-colors duration-200">
+<div class="flex justify-between items-center w-full px-margin py-base max-w-screen-xl mx-auto">
+<div class="flex items-center gap-sm">
+<img alt="AI Stick Logo" class="h-10 w-10 object-contain" data-alt="A minimalist logo for a high-end AI productivity tool called AI Stick. The logo features a sleek, vertical stylus-like icon that integrates the letters A and I using clean lines and flat vector geometry. The color palette consists of deep indigo and vibrant teal against a pristine white background, conveying a professional and technologically advanced aesthetic that feels durable and precise." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-PrBDA67KP8xrgQb5nN_Jz9EWXvN4902NYA-vSXszfkzjnBl77KH_75ppV0CCo8ghCcvuvcW1efffBoxTq3dqSdaPE_Xj6-P0jag6_fUek3e7Cjl7T33P7Pvv-A6Tyi9WlJGDeyu2qGwlI5cgXcJbFKp7dj9sd5L-BnbMiyZSSeJtmBegiuhhutpdmnTMDeB2w-Nwl0yAl1UGZ0nhFp2JXhuMfebFT_6_mYgNVKcNmtK7IvKkCDf0TFOP8r3unMI7rEBCsBkuV_eX"/>
+<h1 class="font-h1 text-h1 font-bold text-primary">AI Stick</h1>
+</div>
+<div class="flex items-center gap-md">
+<div class="active:scale-95 duration-200 hover:bg-surface-container transition-colors rounded-full p-xs cursor-pointer">
+<span class="material-symbols-outlined text-primary" data-icon="settings">settings</span>
+</div>
+<div class="h-10 w-10 rounded-full bg-primary-fixed overflow-hidden ring-2 ring-primary-container">
+<img alt="User profile" data-alt="A high-quality professional headshot of a bilingual linguist in a modern workspace environment. The individual has a focused and intelligent expression, representing a user of a high-end productivity tool. The lighting is soft and natural, with a clean, minimalist background that complements the corporate modern aesthetic of the AI Stick platform." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC8hx6_2MlX73vmZqqhWmqFgTuQ9g2RPpR336Tsc6XRFBN4ECTQ8ykG18rPLLtlNU7Wosw5ChSTW46EWAfHY2BALuWw8dHyZQmAB9bSwhgIJ5stIXfokfpaBQxrJrNdWDOD0BUen1Msj-16oe-sUncTfCH9OPJCDquCdzAA7ARcom-LHo3FJqVRiSqEqQLO_TPDvj1QbZr2kCIV0r1cVdSuPoM_8vt4gKJuTTbnqjHVLPVEnVLIV-E3EZ7CBvmTbVlAplfmU6wv5dgl"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="max-w-screen-xl mx-auto px-margin py-lg">
+<!-- Welcome Hero -->
+<section class="mb-xl">
+<div class="flex flex-col gap-xs">
+<h2 class="font-h2 text-h2 text-primary">Good Morning, Linguist</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">What would you like to build today?</p>
+</div>
+</section>
+<!-- Bento Grid Action Cards -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-md mb-xl">
+<!-- 1. Translate -->
+<div class="bg-surface-container-lowest rounded-xl p-lg shadow-sm hover:shadow-md transition-all active:scale-95 cursor-pointer flex flex-col gap-md border border-outline-variant/10">
+<div class="bg-secondary-container text-on-secondary-container h-12 w-12 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-h2" data-icon="translate">translate</span>
+</div>
+<div>
+<h3 class="font-h2 text-[20px] text-primary">Translate</h3>
+<p class="font-body-md text-on-surface-variant text-[14px]">Quick English to Runyoro text conversion.</p>
+</div>
+<div class="mt-auto flex justify-end">
+<span class="material-symbols-outlined text-secondary" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</div>
+<!-- 2. AI Chat -->
+<div class="bg-surface-container-lowest rounded-xl p-lg shadow-sm hover:shadow-md transition-all active:scale-95 cursor-pointer flex flex-col gap-md border border-outline-variant/10">
+<div class="bg-primary-container text-on-primary-container h-12 w-12 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-h2" data-icon="chat_bubble">chat_bubble</span>
+</div>
+<div>
+<h3 class="font-h2 text-[20px] text-primary">AI Chat</h3>
+<p class="font-body-md text-on-surface-variant text-[14px]">Conversational assistance &amp; insights.</p>
+</div>
+<div class="mt-auto flex justify-end">
+<span class="material-symbols-outlined text-primary" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</div>
+<!-- 3. Document Editor -->
+<div class="bg-surface-container-lowest rounded-xl p-lg shadow-sm hover:shadow-md transition-all active:scale-95 cursor-pointer flex flex-col gap-md border border-outline-variant/10">
+<div class="bg-secondary-fixed text-on-secondary-fixed-variant h-12 w-12 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-h2" data-icon="description">description</span>
+</div>
+<div>
+<h3 class="font-h2 text-[20px] text-primary">Editor</h3>
+<p class="font-body-md text-on-surface-variant text-[14px]">Full document localization &amp; layout.</p>
+</div>
+<div class="mt-auto flex justify-end">
+<span class="material-symbols-outlined text-secondary" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</div>
+<!-- 4. Voice Mode -->
+<div class="bg-surface-container-lowest rounded-xl p-lg shadow-sm hover:shadow-md transition-all active:scale-95 cursor-pointer flex flex-col gap-md border border-outline-variant/10">
+<div class="bg-primary-fixed text-on-primary-fixed-variant h-12 w-12 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-h2" data-icon="mic">mic</span>
+</div>
+<div>
+<h3 class="font-h2 text-[20px] text-primary">Voice Mode</h3>
+<p class="font-body-md text-on-surface-variant text-[14px]">Speak and listen in real-time.</p>
+</div>
+<div class="mt-auto flex justify-end">
+<span class="material-symbols-outlined text-primary" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</div>
+</section>
+<!-- AI Processing Bar Simulation -->
+<div class="w-full h-1 bg-surface-container rounded-full overflow-hidden mb-xl">
+<div class="h-full bg-secondary w-1/3 animate-pulse"></div>
+</div>
+<!-- Recent Activity Section -->
+<section>
+<div class="flex justify-between items-center mb-md">
+<h3 class="font-h2 text-h2 text-primary">Recent Activity</h3>
+<button class="text-secondary font-label-sm text-label-sm flex items-center gap-xs">
+                    VIEW ALL <span class="material-symbols-outlined text-[16px]" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+<div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden border border-outline-variant/10">
+<!-- Activity Item 1 -->
+<div class="p-md flex items-center justify-between border-b border-outline-variant/10 hover:bg-surface-container-low transition-colors cursor-pointer group">
+<div class="flex items-center gap-md">
+<div class="h-10 w-10 bg-surface-container-high rounded-lg flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+</div>
+<div>
+<p class="font-body-md font-bold text-primary">Regional Agriculture Report</p>
+<p class="font-label-sm text-on-surface-variant">Last Edited • 2h ago</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors" data-icon="chevron_right">chevron_right</span>
+</div>
+<!-- Activity Item 2 -->
+<div class="p-md flex items-center justify-between border-b border-outline-variant/10 hover:bg-surface-container-low transition-colors cursor-pointer group">
+<div class="flex items-center gap-md">
+<div class="h-10 w-10 bg-surface-container-high rounded-lg flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined" data-icon="translate">translate</span>
+</div>
+<div>
+<p class="font-body-md font-bold text-primary">Greeting Protocol (En -&gt; Run)</p>
+<p class="font-label-sm text-on-surface-variant">Recent Translation • 5h ago</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors" data-icon="chevron_right">chevron_right</span>
+</div>
+<!-- Activity Item 3 -->
+<div class="p-md flex items-center justify-between hover:bg-surface-container-low transition-colors cursor-pointer group">
+<div class="flex items-center gap-md">
+<div class="h-10 w-10 bg-surface-container-high rounded-lg flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="chat_bubble">chat_bubble</span>
+</div>
+<div>
+<p class="font-body-md font-bold text-primary">Idiomatic Expressions Inquiry</p>
+<p class="font-label-sm text-on-surface-variant">Chat Archive • Yesterday</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors" data-icon="chevron_right">chevron_right</span>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar Component -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-gutter py-md bg-surface-container-lowest shadow-[0_-8px_24px_rgba(7,2,53,0.08)] z-50 rounded-t-xl">
+<a class="bg-secondary-container text-on-secondary-container rounded-full px-lg py-xs flex flex-col items-center gap-xs active:scale-90 duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="home" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</a>
+<a class="text-on-surface-variant flex flex-col items-center gap-xs opacity-70 hover:bg-surface-container-high transition-all rounded-xl p-xs active:scale-90 duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="translate">translate</span>
+<span class="font-label-sm text-label-sm">Translate</span>
+</a>
+<a class="text-on-surface-variant flex flex-col items-center gap-xs opacity-70 hover:bg-surface-container-high transition-all rounded-xl p-xs active:scale-90 duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="chat_bubble">chat_bubble</span>
+<span class="font-label-sm text-label-sm">Chat</span>
+</a>
+<a class="text-on-surface-variant flex flex-col items-center gap-xs opacity-70 hover:bg-surface-container-high transition-all rounded-xl p-xs active:scale-90 duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+<span class="font-label-sm text-label-sm">Editor</span>
+</a>
+</nav>
+</body></html>

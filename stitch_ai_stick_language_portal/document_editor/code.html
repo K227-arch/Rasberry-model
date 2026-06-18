@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AI Stick - Professional Editor</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+                  "on-background": "#191c1e",
+                  "surface-container-high": "#e6e8ea",
+                  "primary-fixed": "#e3dfff",
+                  "on-surface": "#191c1e",
+                  "on-primary-container": "#8683ba",
+                  "secondary-fixed": "#89f5e7",
+                  "surface-container-low": "#f2f4f6",
+                  "background": "#f7f9fb",
+                  "on-primary-fixed": "#181445",
+                  "on-secondary-fixed-variant": "#005049",
+                  "secondary-fixed-dim": "#6bd8cb",
+                  "on-tertiary-fixed-variant": "#38485d",
+                  "on-secondary-container": "#006f66",
+                  "on-primary-fixed-variant": "#444173",
+                  "outline-variant": "#c8c5d0",
+                  "tertiary": "#000c1d",
+                  "surface": "#f7f9fb",
+                  "on-tertiary-fixed": "#0b1c30",
+                  "surface-container": "#eceef0",
+                  "error-container": "#ffdad6",
+                  "tertiary-container": "#122336",
+                  "secondary": "#006a61",
+                  "surface-container-highest": "#e0e3e5",
+                  "secondary-container": "#86f2e4",
+                  "surface-variant": "#e0e3e5",
+                  "tertiary-fixed-dim": "#b7c8e1",
+                  "surface-tint": "#5b598c",
+                  "on-surface-variant": "#47464f",
+                  "surface-bright": "#f7f9fb",
+                  "on-tertiary-container": "#7a8aa2",
+                  "on-error-container": "#93000a",
+                  "primary-container": "#1e1b4b",
+                  "inverse-surface": "#2d3133",
+                  "on-tertiary": "#ffffff",
+                  "tertiary-fixed": "#d3e4fe",
+                  "outline": "#787680",
+                  "surface-container-lowest": "#ffffff",
+                  "on-primary": "#ffffff",
+                  "on-secondary-fixed": "#00201d",
+                  "on-error": "#ffffff",
+                  "primary-fixed-dim": "#c4c1fb",
+                  "surface-dim": "#d8dadc",
+                  "on-secondary": "#ffffff",
+                  "inverse-primary": "#c4c1fb",
+                  "primary": "#070235",
+                  "inverse-on-surface": "#eff1f3",
+                  "error": "#ba1a1a"
+          },
+          "borderRadius": {
+                  "DEFAULT": "0.25rem",
+                  "lg": "0.5rem",
+                  "xl": "0.75rem",
+                  "full": "9999px"
+          },
+          "spacing": {
+                  "lg": "24px",
+                  "xl": "40px",
+                  "sm": "12px",
+                  "xs": "4px",
+                  "base": "8px",
+                  "md": "16px",
+                  "gutter": "16px",
+                  "margin": "20px"
+          },
+          "fontFamily": {
+                  "h2": ["Inter"],
+                  "label-sm": ["Inter"],
+                  "h1": ["Inter"],
+                  "body-lg": ["Inter"],
+                  "body-md": ["Inter"]
+          },
+          "fontSize": {
+                  "h2": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                  "label-sm": ["13px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                  "h1": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                  "body-lg": ["18px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400"}],
+                  "body-md": ["16px", {"lineHeight": "1.5", "letterSpacing": "0", "fontWeight": "400"}]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    body {
+      background-color: #f7f9fb;
+    }
+    .paper-shadow {
+      box-shadow: 0 4px 6px -1px rgba(7, 2, 53, 0.05), 0 2px 4px -1px rgba(7, 2, 53, 0.03);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="bg-surface docked full-width top-0 shadow-sm z-50">
+<div class="flex justify-between items-center w-full px-margin py-base max-w-screen-xl mx-auto">
+<div class="flex items-center gap-md">
+<img alt="AI Stick Logo" class="w-10 h-10 object-contain" data-alt="A minimalist logo for a tech brand called 'AI Stick'. The logo features a sleek, vertical stylus-like icon that subtly incorporates the letters 'A' and 'I'. The design is executed in a flat vector style with clean lines and professional aesthetics. It uses a color palette of deep indigo and vibrant teal against a crisp white background to convey intelligence and modern software precision." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-PrBDA67KP8xrgQb5nN_Jz9EWXvN4902NYA-vSXszfkzjnBl77KH_75ppV0CCo8ghCcvuvcW1efffBoxTq3dqSdaPE_Xj6-P0jag6_fUek3e7Cjl7T33P7Pvv-A6Tyi9WlJGDeyu2qGwlI5cgXcJbFKp7dj9sd5L-BnbMiyZSSeJtmBegiuhhutpdmnTMDeB2w-Nwl0yAl1UGZ0nhFp2JXhuMfebFT_6_mYgNVKcNmtK7IvKkCDf0TFOP8r3unMI7rEBCsBkuV_eX"/>
+<h1 class="font-h1 text-h1 font-bold text-primary">AI Stick</h1>
+</div>
+<div class="hidden md:flex items-center gap-lg">
+<button class="text-on-surface-variant hover:bg-surface-container transition-colors px-md py-xs rounded-lg active:scale-95 duration-200">File</button>
+<button class="text-on-surface-variant hover:bg-surface-container transition-colors px-md py-xs rounded-lg active:scale-95 duration-200">View</button>
+<button class="text-primary font-bold hover:bg-surface-container transition-colors px-md py-xs rounded-lg active:scale-95 duration-200">Editor</button>
+</div>
+<div class="flex items-center gap-sm">
+<button class="flex items-center gap-xs bg-secondary text-on-secondary px-lg py-xs rounded-full font-label-sm text-label-sm hover:opacity-90 active:scale-95 duration-150">
+<span class="material-symbols-outlined text-[20px]" data-icon="upload">upload</span>
+          Upload
+        </button>
+<div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-on-primary-fixed font-bold">JD</div>
+</div>
+</div>
+</header>
+<!-- Main Toolbar -->
+<section class="bg-surface-container-lowest border-b border-outline-variant sticky top-[64px] z-40">
+<div class="max-w-screen-xl mx-auto px-margin py-sm flex flex-wrap items-center gap-md">
+<!-- Formatting Group -->
+<div class="flex items-center bg-surface-container rounded-lg p-xs">
+<button class="p-xs hover:bg-surface-container-highest rounded transition-all material-symbols-outlined text-on-surface-variant" data-icon="format_bold">format_bold</button>
+<button class="p-xs hover:bg-surface-container-highest rounded transition-all material-symbols-outlined text-on-surface-variant" data-icon="format_italic">format_italic</button>
+<button class="p-xs hover:bg-surface-container-highest rounded transition-all material-symbols-outlined text-on-surface-variant" data-icon="format_underlined">format_underlined</button>
+<div class="w-px h-6 bg-outline-variant mx-xs"></div>
+<button class="p-xs hover:bg-surface-container-highest rounded transition-all material-symbols-outlined text-on-surface-variant" data-icon="format_list_bulleted">format_list_bulleted</button>
+<button class="p-xs hover:bg-surface-container-highest rounded transition-all material-symbols-outlined text-on-surface-variant" data-icon="format_list_numbered">format_list_numbered</button>
+</div>
+<!-- Alignment Group -->
+<div class="flex items-center bg-surface-container rounded-lg p-xs">
+<button class="p-xs hover:bg-surface-container-highest rounded transition-all material-symbols-outlined text-on-surface-variant" data-icon="format_align_left">format_align_left</button>
+<button class="p-xs hover:bg-surface-container-highest rounded transition-all material-symbols-outlined text-on-surface-variant" data-icon="format_align_center">format_align_center</button>
+<button class="p-xs hover:bg-surface-container-highest rounded transition-all material-symbols-outlined text-on-surface-variant" data-icon="format_align_right">format_align_right</button>
+</div>
+<!-- Tools Group -->
+<div class="flex items-center gap-sm ml-auto">
+<button class="flex items-center gap-xs px-md py-xs rounded-lg border border-outline text-on-surface-variant hover:bg-surface-container transition-all">
+<span class="material-symbols-outlined" data-icon="spellcheck">spellcheck</span>
+<span class="font-label-sm text-label-sm">Spellcheck</span>
+</button>
+<button class="flex items-center gap-xs bg-primary text-on-primary px-lg py-xs rounded-lg font-label-sm text-label-sm hover:opacity-90 active:scale-95 duration-150">
+<span class="material-symbols-outlined" data-icon="save">save</span>
+          Save
+        </button>
+</div>
+</div>
+</section>
+<!-- Editor Workspace -->
+<main class="flex-1 overflow-y-auto pt-xl pb-xl px-margin">
+<div class="max-w-[816px] mx-auto">
+<!-- Document Page -->
+<div class="bg-surface-container-lowest paper-shadow min-h-[1056px] p-xl rounded-lg relative">
+<!-- AI Processing Bar -->
+<div class="absolute top-0 left-0 w-full h-1 bg-secondary opacity-20 overflow-hidden">
+<div class="h-full bg-secondary animate-pulse w-1/3 rounded-full"></div>
+</div>
+<!-- Language Chip -->
+<div class="flex justify-end mb-lg">
+<div class="inline-flex bg-surface-container rounded-full p-xs">
+<span class="px-md py-xs rounded-full font-label-sm text-label-sm text-on-surface-variant">English</span>
+<span class="px-md py-xs rounded-full font-label-sm text-label-sm bg-secondary text-on-secondary">Runyoro-Rutooro</span>
+</div>
+</div>
+<!-- Document Content -->
+<article class="prose prose-slate max-w-none">
+<h2 class="font-h2 text-h2 text-primary mb-md">Okukorra Hamu n'ebitabo</h2>
+<p class="font-body-lg text-body-lg text-on-surface mb-lg leading-relaxed">
+            Eki kika ky'ebitabo kikatandikibwawo n'ekigendererwa ky'okuhwera abantu okusoma n'okwetegereza obuhangwa bwaitu. Mukama akatuha obusinge n'obumanzi mukukora gunu omulimo.
+          </p>
+<p class="font-body-lg text-body-lg text-on-surface mb-lg leading-relaxed">
+            Tusemeriire kukuuma ebirabo byaitu kandi <span class="relative inline-block">
+<span class="border-b-2 border-error text-on-surface cursor-help">okusomererwa</span>
+<!-- Tooltip / Spellcheck Popover -->
+</span></p><div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-base w-48 bg-inverse-surface text-inverse-on-surface rounded-lg p-sm shadow-xl z-10">
+<p class="text-[12px] font-bold mb-xs opacity-80">Did you mean:</p>
+<button class="w-full text-left font-bold text-secondary-container hover:bg-white/10 p-xs rounded transition-colors mb-xs">okusomerwa</button>
+<div class="flex gap-xs border-t border-white/10 pt-xs mt-xs">
+<button class="text-[11px] hover:underline">Ignore All</button>
+<button class="text-[11px] hover:underline ml-auto">Add to Dictionary</button>
+</div>
+<div class="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-inverse-surface"></div>
+</div>
+ obugabe bwaitu mukisoro. Abantu boona baine obugabe obuntu.
+          <p></p>
+<p class="font-body-lg text-body-lg text-on-surface leading-relaxed">
+            Entekaniza enu n'eya mwebaza muno habw'okutuhwera mukuteekaniza ebigambo binu. AI Stick neehwera muno mukuboneza ennimi zaitu ez'ekibira.
+          </p>
+</article>
+</div>
+<!-- Floating Tooltip for Dictionary (Secondary Feature) -->
+<div class="mt-xl grid grid-cols-1 md:grid-cols-2 gap-md">
+<div class="bg-surface-container-low p-md rounded-xl border border-outline-variant">
+<div class="flex items-center gap-sm mb-xs">
+<span class="material-symbols-outlined text-secondary" data-icon="menu_book">menu_book</span>
+<h3 class="font-bold text-primary">Dictionary Match</h3>
+</div>
+<p class="text-on-surface-variant font-body-md italic mb-base">"Okusomerwa" (Verb)</p>
+<p class="text-on-surface-variant font-body-md">To be read for; to be educated. Root: kusoma (read).</p>
+</div>
+<div class="bg-surface-container-low p-md rounded-xl border border-outline-variant">
+<div class="flex items-center gap-sm mb-xs">
+<span class="material-symbols-outlined text-secondary" data-icon="auto_awesome">auto_awesome</span>
+<h3 class="font-bold text-primary">AI Suggestion</h3>
+</div>
+<p class="text-on-surface-variant font-body-md">Consider using <strong>'okuhaburwa'</strong> for a more formal tone regarding education context.</p>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 rounded-t-xl shadow-[0_-8px_24px_rgba(7,2,53,0.08)] bg-surface-container-lowest flex justify-around items-center px-gutter py-md">
+<div class="text-on-surface-variant flex flex-col items-center gap-xs opacity-70">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</div>
+<div class="text-on-surface-variant flex flex-col items-center gap-xs opacity-70">
+<span class="material-symbols-outlined" data-icon="translate">translate</span>
+<span class="font-label-sm text-label-sm">Translate</span>
+</div>
+<div class="text-on-surface-variant flex flex-col items-center gap-xs opacity-70">
+<span class="material-symbols-outlined" data-icon="chat_bubble">chat_bubble</span>
+<span class="font-label-sm text-label-sm">Chat</span>
+</div>
+<div class="bg-secondary-container text-on-secondary-container rounded-full px-lg py-xs flex flex-col items-center gap-xs">
+<span class="material-symbols-outlined" data-icon="description" style="font-variation-settings: 'FILL' 1;">description</span>
+<span class="font-label-sm text-label-sm">Editor</span>
+</div>
+</nav>
+</body></html>

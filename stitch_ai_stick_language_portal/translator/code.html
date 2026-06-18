@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AI Stick - Professional Translation</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-background": "#191c1e",
+                        "surface-container-high": "#e6e8ea",
+                        "primary-fixed": "#e3dfff",
+                        "on-surface": "#191c1e",
+                        "on-primary-container": "#8683ba",
+                        "secondary-fixed": "#89f5e7",
+                        "surface-container-low": "#f2f4f6",
+                        "background": "#f7f9fb",
+                        "on-primary-fixed": "#181445",
+                        "on-secondary-fixed-variant": "#005049",
+                        "secondary-fixed-dim": "#6bd8cb",
+                        "on-tertiary-fixed-variant": "#38485d",
+                        "on-secondary-container": "#006f66",
+                        "on-primary-fixed-variant": "#444173",
+                        "outline-variant": "#c8c5d0",
+                        "tertiary": "#000c1d",
+                        "surface": "#f7f9fb",
+                        "on-tertiary-fixed": "#0b1c30",
+                        "surface-container": "#eceef0",
+                        "error-container": "#ffdad6",
+                        "tertiary-container": "#122336",
+                        "secondary": "#006a61",
+                        "surface-container-highest": "#e0e3e5",
+                        "secondary-container": "#86f2e4",
+                        "surface-variant": "#e0e3e5",
+                        "tertiary-fixed-dim": "#b7c8e1",
+                        "surface-tint": "#5b598c",
+                        "on-surface-variant": "#47464f",
+                        "surface-bright": "#f7f9fb",
+                        "on-tertiary-container": "#7a8aa2",
+                        "on-error-container": "#93000a",
+                        "primary-container": "#1e1b4b",
+                        "inverse-surface": "#2d3133",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed": "#d3e4fe",
+                        "outline": "#787680",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "on-secondary-fixed": "#00201d",
+                        "on-error": "#ffffff",
+                        "primary-fixed-dim": "#c4c1fb",
+                        "surface-dim": "#d8dadc",
+                        "on-secondary": "#ffffff",
+                        "inverse-primary": "#c4c1fb",
+                        "primary": "#070235",
+                        "inverse-on-surface": "#eff1f3",
+                        "error": "#ba1a1a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "lg": "24px",
+                        "xl": "40px",
+                        "sm": "12px",
+                        "xs": "4px",
+                        "base": "8px",
+                        "md": "16px",
+                        "gutter": "16px",
+                        "margin": "20px"
+                    },
+                    "fontFamily": {
+                        "h2": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "h1": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "h2": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "label-sm": ["13px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "h1": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "1.5", "letterSpacing": "0", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #f7f9fb;
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="text-on-background min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="docked full-width top-0 z-50 shadow-sm dark:shadow-none bg-surface dark:bg-surface-dim">
+<div class="flex justify-between items-center w-full px-margin py-base max-w-screen-xl mx-auto">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container">
+<img alt="AI Stick Logo" class="w-full h-full object-cover" data-alt="A minimalist logo for a tech brand called 'AI Stick'. The logo features a sleek, vertical stylus-like icon that subtly incorporates the letters 'A' and 'I'. The design is professional and high-tech, using deep indigo and vibrant teal colors against a pristine white background. The visual style is clean, vector-based, and modern, conveying intelligence and precision." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-PrBDA67KP8xrgQb5nN_Jz9EWXvN4902NYA-vSXszfkzjnBl77KH_75ppV0CCo8ghCcvuvcW1efffBoxTq3dqSdaPE_Xj6-P0jag6_fUek3e7Cjl7T33P7Pvv-A6Tyi9WlJGDeyu2qGwlI5cgXcJbFKp7dj9sd5L-BnbMiyZSSeJtmBegiuhhutpdmnTMDeB2w-Nwl0yAl1UGZ0nhFp2JXhuMfebFT_6_mYgNVKcNmtK7IvKkCDf0TFOP8r3unMI7rEBCsBkuV_eX"/>
+</div>
+<h1 class="font-h1 text-h1 font-bold text-primary dark:text-primary-fixed">AI Stick</h1>
+</div>
+<div class="flex items-center gap-md">
+<button class="active:scale-95 duration-200 hover:bg-surface-container transition-colors p-sm rounded-full">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim">settings</span>
+</button>
+</div>
+</div>
+</header>
+<main class="flex-grow flex flex-col items-center justify-start pt-lg pb-xl px-margin max-w-screen-xl mx-auto w-full">
+<!-- Translation Interface Container -->
+<div class="w-full h-full flex flex-col gap-md">
+<!-- Language Selection Controls -->
+<div class="flex items-center justify-between bg-surface-container-lowest rounded-xl p-sm shadow-sm">
+<div class="flex items-center gap-sm">
+<button class="px-md py-xs rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm flex items-center gap-xs">
+                        English
+                        <span class="material-symbols-outlined text-[16px]">expand_more</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-all active:scale-90">
+<span class="material-symbols-outlined text-secondary">swap_horiz</span>
+</button>
+<button class="px-md py-xs rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm flex items-center gap-xs">
+                        Runyoro-Rutooro
+                        <span class="material-symbols-outlined text-[16px]">expand_more</span>
+</button>
+</div>
+<button class="text-secondary font-label-sm text-label-sm flex items-center gap-xs hover:underline">
+<span class="material-symbols-outlined text-[18px]">history</span>
+                    Recent
+                </button>
+</div>
+<!-- Main Workspace: Asymmetric / Split Layout -->
+<div class="flex-grow flex flex-col md:flex-row gap-md min-h-[500px]">
+<!-- Source Input Card -->
+<div class="flex-1 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-lg p-lg flex flex-col relative overflow-hidden group">
+<!-- AI Processing Bar (Pulsing Teal Line) -->
+<div class="absolute top-0 left-0 w-full h-1 bg-secondary-container overflow-hidden opacity-0 group-focus-within:opacity-100 transition-opacity">
+<div class="w-1/3 h-full bg-secondary animate-[pulse_2s_infinite]"></div>
+</div>
+<div class="flex justify-between items-center mb-md">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-widest">Source Language</span>
+<button class="text-outline hover:text-error transition-colors active:scale-90">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<textarea class="flex-grow bg-transparent border-none focus:ring-0 font-body-lg text-body-lg text-on-surface resize-none placeholder:text-outline" placeholder="Enter text here to translate..."></textarea>
+<div class="mt-md flex justify-between items-center border-t border-outline-variant pt-md">
+<span class="text-outline font-label-sm text-label-sm">0 / 5000</span>
+<div class="flex gap-sm">
+<button class="p-xs text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined">mic</span>
+</button>
+<button class="p-xs text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined">volume_up</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Action Central (Mobile: Bottom, Desktop: Center-ish) -->
+<div class="flex flex-row md:flex-col justify-center items-center gap-md">
+<button class="bg-secondary text-on-secondary w-16 h-16 md:w-20 md:h-20 rounded-full shadow-xl flex items-center justify-center active:scale-90 transition-all hover:bg-on-secondary-container group">
+<span class="material-symbols-outlined text-[32px] md:text-[40px] group-hover:rotate-12 transition-transform">translate</span>
+</button>
+</div>
+<!-- Target Output Card -->
+<div class="flex-1 bg-white border-2 border-secondary-container rounded-xl shadow-lg p-lg flex flex-col">
+<div class="flex justify-between items-center mb-md">
+<span class="font-label-sm text-label-sm text-secondary uppercase tracking-widest">Runyoro-Rutooro</span>
+<div class="flex gap-sm">
+<button class="p-xs text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined">content_copy</span>
+</button>
+<button class="p-xs text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined">star</span>
+</button>
+</div>
+</div>
+<div class="flex-grow font-body-lg text-body-lg text-on-surface flex flex-col justify-start">
+<!-- Translation result would appear here -->
+<p class="text-outline-variant italic">Translation will appear here...</p>
+</div>
+<div class="mt-md flex justify-between items-center border-t border-outline-variant pt-md">
+<div class="flex gap-sm">
+<button class="p-xs text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined">share</span>
+</button>
+<button class="p-xs text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined">volume_up</span>
+</button>
+</div>
+<button class="text-secondary font-label-sm text-label-sm hover:underline">Dictionary</button>
+</div>
+</div>
+</div>
+<!-- Linguistic Tools / Suggestions Area -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-md mt-md">
+<div class="bg-surface-container-low p-md rounded-xl border border-outline-variant hover:bg-surface-container transition-colors cursor-pointer group">
+<div class="flex items-center gap-sm mb-xs">
+<span class="material-symbols-outlined text-on-tertiary-container">menu_book</span>
+<h3 class="font-h2 text-h2 text-base">Dictionary</h3>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">Explore complex Runyoro word roots and etymology.</p>
+</div>
+<div class="bg-surface-container-low p-md rounded-xl border border-outline-variant hover:bg-surface-container transition-colors cursor-pointer group">
+<div class="flex items-center gap-sm mb-xs">
+<span class="material-symbols-outlined text-on-tertiary-container">construction</span>
+<h3 class="font-h2 text-h2 text-base">Linguistic Tools</h3>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">Analyze grammar structure and tonal markers.</p>
+</div>
+<div class="bg-surface-container-low p-md rounded-xl border border-outline-variant hover:bg-surface-container transition-colors cursor-pointer group">
+<div class="flex items-center gap-sm mb-xs">
+<span class="material-symbols-outlined text-on-tertiary-container">star</span>
+<h3 class="font-h2 text-h2 text-base">Saved Phrases</h3>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">Quick access to your most used bilingual cards.</p>
+</div>
+</section>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 bg-surface-container-lowest dark:bg-surface-container-low shadow-[0_-8px_24px_rgba(7,2,53,0.08)] rounded-t-xl">
+<div class="fixed bottom-0 left-0 w-full flex justify-around items-center px-gutter py-md">
+<button class="text-on-surface-variant dark:text-on-surface-variant flex flex-col items-center gap-xs opacity-70 hover:bg-surface-container-high transition-all active:scale-90">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</button>
+<button class="bg-secondary-container dark:bg-secondary text-on-secondary-container dark:text-on-secondary rounded-full px-lg py-xs flex flex-col items-center gap-xs active:scale-90 transition-all">
+<span class="material-symbols-outlined">translate</span>
+<span class="font-label-sm text-label-sm">Translate</span>
+</button>
+<button class="text-on-surface-variant dark:text-on-surface-variant flex flex-col items-center gap-xs opacity-70 hover:bg-surface-container-high transition-all active:scale-90">
+<span class="material-symbols-outlined">chat_bubble</span>
+<span class="font-label-sm text-label-sm">Chat</span>
+</button>
+<button class="text-on-surface-variant dark:text-on-surface-variant flex flex-col items-center gap-xs opacity-70 hover:bg-surface-container-high transition-all active:scale-90">
+<span class="material-symbols-outlined">description</span>
+<span class="font-label-sm text-label-sm">Editor</span>
+</button>
+</div>
+</nav>
+<!-- Background Decoration -->
+<div class="fixed inset-0 -z-10 opacity-20 pointer-events-none">
+<div class="absolute top-1/4 -left-20 w-80 h-80 bg-secondary-fixed-dim rounded-full blur-[120px]"></div>
+<div class="absolute bottom-1/4 -right-20 w-96 h-96 bg-primary-fixed-dim rounded-full blur-[140px]"></div>
+</div>
+</body></html>

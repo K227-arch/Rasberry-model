@@ -1,0 +1,59 @@
+# ── Model weights & checkpoints (pushed to HF Hub instead) ──────────────────
+runyoro_nmt/models/checkpoints/
+runyoro_nmt/models/exported/
+
+# ── HuggingFace / PyTorch large binaries ─────────────────────────────────────
+*.bin
+*.safetensors
+*.pt
+*.pth
+*.gguf
+*.onnx
+
+# ── Python cache ──────────────────────────────────────────────────────────────
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# ── Virtual environments ──────────────────────────────────────────────────────
+venv/
+env/
+.env
+.venv/
+
+# ── MLflow / experiment tracking ─────────────────────────────────────────────
+runyoro_nmt/experiments/mlruns/
+mlruns/
+
+# ── Jupyter ───────────────────────────────────────────────────────────────────
+.ipynb_checkpoints/
+*.ipynb
+
+# ── OS ────────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Editor ────────────────────────────────────────────────────────────────────
+.vscode/settings.json
+.idea/
+
+# ── Temp / logs ───────────────────────────────────────────────────────────────
+*.log
+training.log
+pipeline.log
+test_run*/
+test_q*/
+tq*/
+tq2*/
+C:/tmp/
+
+# ── Large data files (dataset pushed to HF Hub) ──────────────────────────────
+# Keep TSV splits and reports, exclude huge augmented files if > 10MB
+# (the TSV files are small enough to commit)

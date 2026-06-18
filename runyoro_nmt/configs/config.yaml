@@ -1,0 +1,170 @@
+# =============================================================================
+# Runyoro-Rutooro <-> English Neural Machine Translation
+# Master Configuration File
+# Model: runyoro-nmt-v1 (separate from any pre-existing NLLB fine-tunes)
+# =============================================================================
+
+project:
+  name: "runyoro-nmt-v1"
+  version: "1.0.0"
+  description: "Production-grade bidirectional Runyoro-Rutooro <-> English NMT"
+  hf_org: "kathay"
+  hf_model_id: "kathay/runyoro-nmt-v1"
+  hf_dataset_id: "kathay/runyoro-rutooro-en-parallel"
+  hf_space_id: "kathay/runyoro-translator"
+  github_repo: "runyoro-nmt-v1"
+  language_pair:
+    source_codes: ["nyk", "en"]    # nyk = Nyankore/Rutooro (closest ISO 639-3)
+    display: "Runyoro-Rutooro ↔ English"
+  raw_data_dir: "../raw data"
+  output_dir: "./outputs"
+
+# -----------------------------------------------------------------------------
+# Base model (NLLB-200 distilled — strongest publicly available multilingual MT)
+# THIS IS A NEW SEPARATE FINE-TUNE — do not overwrite existing checkpoints
+# -----------------------------------------------------------------------------
+model:
+  # 2x RTX 4090 (48 GB total VRAM) — use the strongest distilled model
+  base_model_name: "facebook/nllb-200-distilled-1.3B"
+  src_lang_nllb: "nyk_Latn"      # Runyoro-Rutooro in NLLB tokenizer
+  tgt_lang_nllb: "eng_Latn"      # English
+  # For reverse direction the src/tgt are swapped at runtime
+  max_source_length: 256
+  max_target_length: 256
+  tokenizer_name: "facebook/nllb-200-distilled-1.3B"
+
+# -----------------------------------------------------------------------------
+# Data pipeline
+# -----------------------------------------------------------------------------
+data:
+  raw_files:
+    - "../raw data/Agriculture Seed Vocabulary.csv.xlsx"
+    - "../raw data/augmentted pos pairs.xlsx"
+    - "../raw data/Ff_fixed worked on.docx"
+    - "../raw data/J_fixed Worked on.docx"
+    - "../raw data/Tt fixed worked on.docx"
+    - "../raw data/U_fixed ...docx"
+    - "../raw data/V_fixed worked on.docx"
+    - "../raw data/W_fixed worked on.docx"
+  processed_dir: "./data/processed"
+  augmented_dir: "./data/augmented"
+  tm_dir: "./data/tm"
+  glossary_dir: "./data/glossary"
+  reports_dir: "./data/reports"
+  # Column name heuristics (auto-detected but listed here as fallback)
+  runyoro_col_hints: ["runyoro", "rutooro", "nyoro", "nyk", "local", "vernacular", "runya"]
+  english_col_hints: ["english", "eng", "en", "translation", "meaning"]
+  # Splitting
+  train_ratio: 0.85
+  val_ratio: 0.10
+  test_ratio: 0.05
+  seed: 42
+  # Quality thresholds
+  min_tokens: 2
+  max_tokens: 200
+  min_char_ratio: 0.4      # min(len_src, len_tgt) / max(len_src, len_tgt)
+  max_char_ratio_multiplier: 4.0
+  deduplicate: true
+  normalize_unicode: true
+  # Augmentation
+  augmentation:
+    back_translation: true
+    synonym_swap: true
+    token_deletion_prob: 0.05
+    token_swap_prob: 0.05
+    augment_multiplier: 2   # generate 2x augmented samples per original
+
+# -----------------------------------------------------------------------------
+# Training hyperparameters
+# -----------------------------------------------------------------------------
+training:
+  output_dir: "./models/checkpoints/runyoro-nmt-v1"
+  num_train_epochs: 15
+  per_device_train_batch_size: 16    # safe for 1.3B + DataParallel on 24GB
+  per_device_eval_batch_size: 32
+  gradient_accumulation_steps: 4    # effective batch = 16*4 = 64
+  learning_rate: 5.0e-5
+  warmup_steps: 500
+  weight_decay: 0.01
+  lr_scheduler_type: "cosine"
+  fp16: false
+  bf16: true                         # RTX 4090 Ampere supports bf16 natively
+  save_strategy: "epoch"
+  evaluation_strategy: "epoch"
+  load_best_model_at_end: true
+  metric_for_best_model: "bleu"
+  greater_is_better: true
+  logging_steps: 50
+  save_total_limit: 3
+  predict_with_generate: true
+  generation_max_length: 256
+  generation_num_beams: 4
+  label_smoothing_factor: 0.0   # disabled — avoids Trainer popping labels before forward
+  dataloader_num_workers: 4
+  ddp_find_unused_parameters: false  # multi-GPU DDP optimisation
+  # Curriculum learning — disabled for stability on small dataset
+  curriculum_learning:
+    enabled: false
+  # Contrastive learning
+  contrastive_learning:
+    enabled: true
+    margin: 0.5
+    temperature: 0.07
+  # Domain adaptation
+  domain_adaptation:
+    enabled: true
+    domain_weight_agriculture: 1.5
+    domain_weight_general: 1.0
+
+# -----------------------------------------------------------------------------
+# Evaluation metrics
+# -----------------------------------------------------------------------------
+evaluation:
+  metrics:
+    - "bleu"
+    - "chrf"
+    - "ter"
+    - "bertscore"
+    - "comet"
+  bleu_tokenize: "13a"
+  chrf_word_order: 2         # chrF++
+  bertscore_model: "microsoft/deberta-xlarge-mnli"
+  comet_model: "Unbabel/wmt22-comet-da"
+  human_eval:
+    enabled: false           # toggle true when human annotators available
+    criteria: ["fluency", "adequacy", "terminology", "cultural_appropriateness"]
+
+# -----------------------------------------------------------------------------
+# Inference & export
+# -----------------------------------------------------------------------------
+inference:
+  quantization: "int8"       # options: none, int8, int4
+  export_format: "onnx"      # options: pytorch, onnx, ctranslate2
+  device: "cpu"              # edge/Pi deployment
+  batch_size: 1
+  beam_size: 4
+  length_penalty: 1.0
+  api_port: 8000
+
+# -----------------------------------------------------------------------------
+# Experiment tracking
+# -----------------------------------------------------------------------------
+tracking:
+  mlflow:
+    enabled: true
+    experiment_name: "runyoro-nmt-v1"
+    tracking_uri: "./experiments/mlruns"
+  wandb:
+    enabled: false
+    project: "runyoro-nmt-v1"
+    entity: "kathay"
+
+# -----------------------------------------------------------------------------
+# Hugging Face Hub push
+# -----------------------------------------------------------------------------
+hub:
+  push_model: true
+  push_dataset: true
+  push_space: true
+  private: false
+  commit_message: "runyoro-nmt-v1: production fine-tune"
