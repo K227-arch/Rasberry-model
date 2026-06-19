@@ -15,7 +15,7 @@ import torch
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("gradio_app")
 
-MODEL_ID = os.environ.get("MODEL_ID", "./models/checkpoints/runyoro-nmt-v1")
+MODEL_ID = os.environ.get("MODEL_ID", "kathay/runyoro-nmt-v1")
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 logger.info("Loading model: %s on %s", MODEL_ID, DEVICE)
