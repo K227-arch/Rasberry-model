@@ -6,6 +6,7 @@ Deployed to: https://huggingface.co/spaces/kathay/runyoro-translator
 """
 
 import os
+import re
 import logging
 
 import gradio as gr  # type: ignore
@@ -27,6 +28,23 @@ logger.info("Model ready")
 NLLB_RNY = "nyk_Latn"
 NLLB_ENG = "eng_Latn"
 
+# Regex to strip POS tags that leaked from training data
+# e.g. [GENERAL_NOUN], [COMMON_ANIMALS_NOUN], [MATHEMATICS_NOUN] etc.
+POS_TAG_RE = re.compile(r"\[[A-Z_]+\]\s*")
+
+
+def _clean_translation(text: str, tgt_lang: str) -> str:
+    """Post-process model output: strip POS tags, fix capitalisation."""
+    text = text.strip()
+    # Strip leaked POS tags like [GENERAL_NOUN], [GENERAL_VERB] etc.
+    text = POS_TAG_RE.sub("", text).strip()
+    # Strip leading hyphens sometimes prepended by the model
+    text = re.sub(r"^-\s*", "", text).strip()
+    # Capitalise English output
+    if tgt_lang == NLLB_ENG and text and text[0].islower():
+        text = text[0].upper() + text[1:]
+    return text
+
 EXAMPLES = [
     ["Runyoro → English", "Oraire ota?", ""],
     ["Runyoro → English", "Webale muno kunkonyera.", ""],
@@ -46,7 +64,7 @@ def translate(text: str, direction: str) -> str:
     tgt_lang = NLLB_ENG if "Runyoro" in direction else NLLB_RNY
 
     tokenizer.src_lang = src_lang
-    forced_bos_id = tokenizer.lang_code_to_id[tgt_lang]
+    forced_bos_id = tokenizer.convert_tokens_to_ids(tgt_lang)
 
     enc = tokenizer(text, return_tensors="pt", max_length=256, truncation=True).to(DEVICE)
     with torch.no_grad():
@@ -58,12 +76,7 @@ def translate(text: str, direction: str) -> str:
             length_penalty=1.0,
         )
     translation = tokenizer.decode(out[0], skip_special_tokens=True)
-
-    # Basic post-processing
-    translation = translation.strip()
-    if tgt_lang == NLLB_ENG and translation and translation[0].islower():
-        translation = translation[0].upper() + translation[1:]
-
+    translation = _clean_translation(translation, tgt_lang)
     return translation
 
 

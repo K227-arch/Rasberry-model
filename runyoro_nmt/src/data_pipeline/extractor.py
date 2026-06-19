@@ -194,6 +194,12 @@ def _extract_spreadsheet(path: Path) -> List[Tuple[str, str]]:
             # Only drop if content-free (pure symbols/numbers)
             if re.fullmatch(r"[\d\s\W]+", rny) or re.fullmatch(r"[\d\s\W]+", eng):
                 continue
+            # Strip POS category tags from augmented pos pairs xlsx
+            # e.g. "[GENERAL_NOUN] someone's relatives" -> "someone's relatives"
+            rny = re.sub(r"^\[[A-Z_]+\]\s*", "", rny).strip()
+            eng = re.sub(r"^\[[A-Z_]+\]\s*", "", eng).strip()
+            if not rny or not eng:
+                continue
             pairs.append((rny, eng))
 
     logger.info("  [%s] %d pairs from spreadsheet", path.name, len(pairs))
