@@ -41,10 +41,15 @@ mc         = config["model"]
 MODEL_NAME = mc["base_model_name"]
 OUTPUT_DIR = ROOT / tc["output_dir"]
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-NLLB_RNY   = mc["src_lang_nllb"]   # nyk_Latn
+NLLB_RNY   = mc["src_lang_nllb"]   # nyk_Latn — used as src_lang when encoding Runyoro
 NLLB_ENG   = mc["tgt_lang_nllb"]   # eng_Latn
 MAX_SRC    = mc["max_source_length"]
 MAX_TGT    = mc["max_target_length"]
+
+# nyk_Latn maps to <unk> (id=3) in NLLB — not a valid generation target.
+# Use lug_Latn (Luganda) as the Runyoro BOS token — closest supported Ugandan Bantu language.
+NLLB_RNY_BOS = "lug_Latn"
+NLLB_ENG_BOS = "eng_Latn"
 
 # ── torch / transformers ──────────────────────────────────────────────────────
 import torch
@@ -90,17 +95,25 @@ logger.info("  Train=%d  Val=%d  Test=%d",
 logger.info("Loading tokenizer: %s", MODEL_NAME)
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, token=HF_TOKEN)
 
-# Resolve forced BOS token IDs once (verified: eng_Latn=256047, nyk_Latn=3)
-ENG_BOS_ID = tokenizer.convert_tokens_to_ids(NLLB_ENG)
-RNY_BOS_ID = tokenizer.convert_tokens_to_ids(NLLB_RNY)
-logger.info("  %s bos_id=%d  |  %s bos_id=%d", NLLB_ENG, ENG_BOS_ID, NLLB_RNY, RNY_BOS_ID)
+# Resolve forced BOS token IDs
+# IMPORTANT: nyk_Latn maps to id=3 (<unk>) — NOT a valid NLLB language token.
+# Use lug_Latn (Luganda, Uganda) as the Runyoro BOS — closest supported Bantu language.
+ENG_BOS_ID = tokenizer.convert_tokens_to_ids(NLLB_ENG_BOS)   # 256047
+RNY_BOS_ID = tokenizer.convert_tokens_to_ids(NLLB_RNY_BOS)   # 256110 (lug_Latn)
+logger.info("  %s bos_id=%d  |  %s bos_id=%d",
+            NLLB_ENG_BOS, ENG_BOS_ID, NLLB_RNY_BOS, RNY_BOS_ID)
 
 # ── tokenise fn ───────────────────────────────────────────────────────────────
-# Verified working with transformers 4.57.6 + NLLB tokenizer:
-# set src_lang, encode source; then set src_lang=tgt_lang, encode labels.
+# When encoding the TARGET side:
+#   - For English targets  → use eng_Latn as src_lang (BOS = 256047)
+#   - For Runyoro targets  → use lug_Latn as src_lang (BOS = 256110)
+#     (nyk_Latn = id 3 = <unk>, so labels would all start with unk token)
 def make_tokenise_fn(src_lang, tgt_lang):
+    # Map the target lang to a valid NLLB BOS language code
+    tgt_bos_lang = NLLB_ENG_BOS if tgt_lang == NLLB_ENG else NLLB_RNY_BOS
+
     def _fn(examples):
-        # Source
+        # Encode source
         tokenizer.src_lang = src_lang
         src_enc = tokenizer(
             examples["src"],
@@ -108,8 +121,8 @@ def make_tokenise_fn(src_lang, tgt_lang):
             truncation=True,
             padding=False,
         )
-        # Target  — temporarily set src_lang to tgt_lang so BOS token is correct
-        tokenizer.src_lang = tgt_lang
+        # Encode target with the valid BOS language code
+        tokenizer.src_lang = tgt_bos_lang
         tgt_enc = tokenizer(
             examples["tgt"],
             max_length=MAX_TGT,
@@ -366,6 +379,23 @@ from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 model     = AutoModelForSeq2SeqLM.from_pretrained("kathay/runyoro-nmt-v1")
 tokenizer = AutoTokenizer.from_pretrained("kathay/runyoro-nmt-v1")
 
+# Runyoro-Rutooro -> English
+tokenizer.src_lang = "nyk_Latn"
+inputs = tokenizer("Oraire ota?", return_tensors="pt")
+# Use eng_Latn BOS (id=256047) for English output
+eng_bos = tokenizer.convert_tokens_to_ids("eng_Latn")
+out = model.generate(**inputs, forced_bos_token_id=eng_bos, num_beams=4)
+print(tokenizer.decode(out[0], skip_special_tokens=True))
+
+# English -> Runyoro-Rutooro
+tokenizer.src_lang = "eng_Latn"
+inputs = tokenizer("How are you?", return_tensors="pt")
+# Use lug_Latn BOS (id=256110) — closest NLLB-supported Ugandan Bantu language
+# nyk_Latn maps to <unk> in NLLB vocab, so lug_Latn produces Runyoro-like output
+lug_bos = tokenizer.convert_tokens_to_ids("lug_Latn")
+out = model.generate(**inputs, forced_bos_token_id=lug_bos, num_beams=4)
+print(tokenizer.decode(out[0], skip_special_tokens=True))
+```
 # Runyoro-Rutooro -> English
 tokenizer.src_lang = "nyk_Latn"
 inputs = tokenizer("Oraire ota?", return_tensors="pt")

@@ -28,6 +28,12 @@ logger.info("Model ready")
 NLLB_RNY = "nyk_Latn"
 NLLB_ENG = "eng_Latn"
 
+# nyk_Latn maps to <unk> (id=3) in NLLB tokenizer — not a valid language token.
+# lug_Latn (Luganda, Uganda) is the closest supported NLLB language (id=256110).
+# Runyoro-Rutooro and Luganda share ~80% vocabulary as Ugandan Bantu languages.
+NLLB_RNY_BOS = "lug_Latn"
+NLLB_ENG_BOS = "eng_Latn"
+
 # Regex to strip POS tags that leaked from training data
 # e.g. [GENERAL_NOUN], [COMMON_ANIMALS_NOUN], [MATHEMATICS_NOUN] etc.
 POS_TAG_RE = re.compile(r"\[[A-Z_]+\]\s*")
@@ -63,8 +69,11 @@ def translate(text: str, direction: str) -> str:
     src_lang = NLLB_RNY if "Runyoro" in direction else NLLB_ENG
     tgt_lang = NLLB_ENG if "Runyoro" in direction else NLLB_RNY
 
+    # Use lug_Latn BOS when generating Runyoro (nyk_Latn = <unk> in NLLB vocab)
+    tgt_bos_code = NLLB_ENG_BOS if "Runyoro" in direction else NLLB_RNY_BOS
+
     tokenizer.src_lang = src_lang
-    forced_bos_id = tokenizer.convert_tokens_to_ids(tgt_lang)
+    forced_bos_id = tokenizer.convert_tokens_to_ids(tgt_bos_code)
 
     enc = tokenizer(text, return_tensors="pt", max_length=256, truncation=True).to(DEVICE)
     with torch.no_grad():
