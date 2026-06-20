@@ -60,6 +60,7 @@ class RunyoroTranslator:
 
     def _load_glossary(self, path: str) -> None:
         import json
+
         try:
             data = json.loads(Path(path).read_text(encoding="utf-8"))
             for item in data:
@@ -83,8 +84,10 @@ class RunyoroTranslator:
             if self.quantize:
                 try:
                     import bitsandbytes  # type: ignore
+
                     logger.info("Applying INT8 quantization...")
                     from transformers import BitsAndBytesConfig  # type: ignore
+
                     quantization_config = BitsAndBytesConfig(load_in_8bit=True)
                     self._model = AutoModelForSeq2SeqLM.from_pretrained(
                         self.model_path,
@@ -92,7 +95,28 @@ class RunyoroTranslator:
                         device_map="auto",
                     )
                 except ImportError:
-                    logger.warning("bitsandbytes not available — running without quantization")
+                    logger.warning(
+                        "bitsandbytes not available — running without quantization"
+                    )
+
+            if (
+                self._tokenizer.convert_tokens_to_ids(NLLB_RNY)
+                == self._tokenizer.unk_token_id
+            ):
+                lug_id = self._tokenizer.convert_tokens_to_ids("lug_Latn")
+                self._tokenizer.add_tokens([NLLB_RNY], special_tokens=True)
+                self._model.resize_token_embeddings(len(self._tokenizer))
+                nyk_id = self._tokenizer.convert_tokens_to_ids(NLLB_RNY)
+                with torch.no_grad():
+                    self._model.get_input_embeddings().weight[nyk_id] = (
+                        self._model.get_input_embeddings().weight[lug_id].clone()
+                    )
+                    self._model.get_output_embeddings().weight[nyk_id] = (
+                        self._model.get_output_embeddings().weight[lug_id].clone()
+                    )
+                logger.info(
+                    "Added nyk_Latn token (id=%d) from lug_Latn embedding", nyk_id
+                )
 
             self._model = self._model.to(self.device)
             self._model.eval()
@@ -176,7 +200,7 @@ class RunyoroTranslator:
         src_lang, tgt_lang = self._resolve_direction(text)
 
         self._tokenizer.src_lang = src_lang
-        forced_bos_id = self._tokenizer.lang_code_to_id[tgt_lang]
+        forced_bos_id = self._tokenizer.convert_tokens_to_ids(tgt_lang)
 
         enc = self._tokenizer(
             text,
@@ -212,6 +236,7 @@ class RunyoroTranslator:
 
         if return_confidence and hasattr(output, "sequences_scores"):
             import math
+
             score = output.sequences_scores[0].item()
             confidence = round(math.exp(score), 4)
             result["confidence"] = confidence
@@ -232,6 +257,7 @@ class RunyoroTranslator:
 # ---------------------------------------------------------------------------
 # FastAPI REST endpoint
 # ---------------------------------------------------------------------------
+
 
 def create_api(model_path: str, glossary_path: Optional[str] = None):
     """
@@ -261,7 +287,7 @@ def create_api(model_path: str, glossary_path: Optional[str] = None):
 
     class TranslateRequest(BaseModel):
         text: str
-        direction: str = "auto"   # "auto" | "rny_to_en" | "en_to_rny"
+        direction: str = "auto"  # "auto" | "rny_to_en" | "en_to_rny"
         return_confidence: bool = False
 
     class TranslateResponse(BaseModel):

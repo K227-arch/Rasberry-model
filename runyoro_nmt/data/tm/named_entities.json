@@ -1,62 +1,334 @@
 [
   {
-    "runyoro": "Bukama",
-    "english": "Kingdom"
+    "runyoro": "Emigiza",
+    "english": "To"
   },
   {
-    "runyoro": "Buraya",
-    "english": "Europe"
+    "runyoro": "Mukama",
+    "english": "Be"
   },
   {
-    "runyoro": "Jinja",
-    "english": "Kaabaleega"
+    "runyoro": "Emyerande",
+    "english": "Potatoes"
   },
   {
-    "runyoro": "Uganda",
+    "runyoro": "Encwangya",
+    "english": "Tricky"
+  },
+  {
+    "runyoro": "Ekaguza",
+    "english": "To"
+  },
+  {
+    "runyoro": "Kampala",
+    "english": "His"
+  },
+  {
+    "runyoro": "Ruhanga",
+    "english": "Thoughts"
+  },
+  {
+    "runyoro": "Emaanyura",
+    "english": "Pull"
+  },
+  {
+    "runyoro": "Kasunganyanja",
+    "english": "Nikyetaaga"
+  },
+  {
+    "runyoro": "Ekcndura",
+    "english": "To"
+  },
+  {
+    "runyoro": "Ehoima",
+    "english": "To"
+  },
+  {
+    "runyoro": "Namugongo",
+    "english": "He"
+  },
+  {
+    "runyoro": "Egama",
+    "english": "To"
+  },
+  {
+    "runyoro": "Ekonga",
+    "english": "Shrug"
+  },
+  {
+    "runyoro": "Bisereko",
     "english": "The"
   },
   {
-    "runyoro": "Hima",
+    "runyoro": "Egiigya",
+    "english": "Type"
+  },
+  {
+    "runyoro": "Bukristaayo",
+    "english": "Christianity"
+  },
+  {
+    "runyoro": "Encamparya",
+    "english": "Withered"
+  },
+  {
+    "runyoro": "Enaanaasi",
+    "english": "Pineapple"
+  },
+  {
+    "runyoro": "Endebe",
+    "english": "Small"
+  },
+  {
+    "runyoro": "Embi",
+    "english": "Both"
+  },
+  {
+    "runyoro": "Omukama",
+    "english": "King"
+  },
+  {
+    "runyoro": "Enuuba",
+    "english": "To"
+  },
+  {
+    "runyoro": "Ebaabira",
+    "english": "To"
+  },
+  {
+    "runyoro": "Ebiihiraniza",
+    "english": "To"
+  },
+  {
+    "runyoro": "Tusiime",
+    "english": "Uganda"
+  },
+  {
+    "runyoro": "Efaafaaniza",
+    "english": "To"
+  },
+  {
+    "runyoro": "Omukama",
+    "english": "When"
+  },
+  {
+    "runyoro": "Kyaka",
     "english": "She"
   },
   {
-    "runyoro": "Adolf",
-    "english": "Luwero"
+    "runyoro": "Ehuuta",
+    "english": "To"
   },
   {
-    "runyoro": "Isebo",
+    "runyoro": "Egenya",
+    "english": "To"
+  },
+  {
+    "runyoro": "Ebooga",
+    "english": "To"
+  },
+  {
+    "runyoro": "Otwana",
     "english": "They"
   },
   {
-    "runyoro": "Mwenge",
-    "english": "He"
+    "runyoro": "Ekuliiriza",
+    "english": "To"
   },
   {
-    "runyoro": "Empurizana",
-    "english": "Communication"
+    "runyoro": "Ega",
+    "english": "To"
   },
   {
-    "runyoro": "Bulaaya",
-    "english": "He"
+    "runyoro": "Ekima",
+    "english": "To"
   },
   {
-    "runyoro": "Baitu",
-    "english": "Yesterday"
+    "runyoro": "Ebondoiga",
+    "english": "To"
   },
   {
     "runyoro": "Byakunaga",
     "english": "She"
   },
   {
+    "runyoro": "Taata",
+    "english": "Father"
+  },
+  {
+    "runyoro": "Egemuliza",
+    "english": "To"
+  },
+  {
+    "runyoro": "Endagaano",
+    "english": "Agreement"
+  },
+  {
+    "runyoro": "Eganira",
+    "english": "To"
+  },
+  {
+    "runyoro": "Uganda",
+    "english": "The"
+  },
+  {
+    "runyoro": "Endebolebo",
+    "english": "Border"
+  },
+  {
+    "runyoro": "Ehingahingisa",
+    "english": "To"
+  },
+  {
+    "runyoro": "Rubaga",
+    "english": "Gods"
+  },
+  {
+    "runyoro": "Endereza",
+    "english": "To"
+  },
+  {
+    "runyoro": "Ebeteka",
+    "english": "To"
+  },
+  {
+    "runyoro": "Endabukya",
+    "english": "Sharp"
+  },
+  {
+    "runyoro": "Ecunda",
+    "english": "To"
+  },
+  {
+    "runyoro": "Mukama",
+    "english": "Lord"
+  },
+  {
+    "runyoro": "Wakame",
+    "english": "Something"
+  },
+  {
+    "runyoro": "Omuroleerezi",
+    "english": "The"
+  },
+  {
+    "runyoro": "Ebaganizaamu",
+    "english": "To"
+  },
+  {
+    "runyoro": "Bulaaya",
+    "english": "He"
+  },
+  {
+    "runyoro": "Emyehembo",
+    "english": "Conceit"
+  },
+  {
+    "runyoro": "Ekubakuba",
+    "english": "To"
+  },
+  {
+    "runyoro": "Empugutani",
+    "english": "Forgetful"
+  },
+  {
+    "runyoro": "Ekilka",
+    "english": "To"
+  },
+  {
+    "runyoro": "Barwenda",
+    "english": "Attend"
+  },
+  {
+    "runyoro": "Eoka",
+    "english": "Self"
+  },
+  {
+    "runyoro": "Ruhanga",
+    "english": "God"
+  },
+  {
+    "runyoro": "Egurukya",
+    "english": "To"
+  },
+  {
+    "runyoro": "Ebengeka",
+    "english": "To"
+  },
+  {
+    "runyoro": "Emererwa",
+    "english": "To"
+  },
+  {
+    "runyoro": "Ekaakura",
+    "english": "To"
+  },
+  {
+    "runyoro": "Rwakijuma",
+    "english": "Europe"
+  },
+  {
+    "runyoro": "Ligwa",
+    "english": "The"
+  },
+  {
+    "runyoro": "Egegecrra",
+    "english": "To"
+  },
+  {
+    "runyoro": "Empyo",
+    "english": "Crocodile"
+  },
+  {
+    "runyoro": "Ehotora",
+    "english": "To"
+  },
+  {
+    "runyoro": "Bwikya",
+    "english": "House"
+  },
+  {
+    "runyoro": "Sande",
+    "english": "If"
+  },
+  {
+    "runyoro": "Ruhanga",
+    "english": "The"
+  },
+  {
+    "runyoro": "Ekubiriza",
+    "english": "Earnestly"
+  },
+  {
+    "runyoro": "Enamba",
+    "english": "Hole"
+  },
+  {
+    "runyoro": "Ecuraniza",
+    "english": "To"
+  },
+  {
+    "runyoro": "Bukama",
+    "english": "Kingdom"
+  },
+  {
+    "runyoro": "Empooka",
+    "english": "Survivor"
+  },
+  {
+    "runyoro": "Wakame",
+    "english": "Mr"
+  },
+  {
     "runyoro": "Ena",
     "english": "All"
   },
   {
-    "runyoro": "Yesu",
-    "english": "Jesus"
+    "runyoro": "Ehenya",
+    "english": "To"
   },
   {
-    "runyoro": "Jeera",
+    "runyoro": "Ekulingura",
     "english": "To"
   },
   {
@@ -64,191 +336,383 @@
     "english": "Bishop"
   },
   {
-    "runyoro": "Rubaga",
-    "english": "Gods"
-  },
-  {
-    "runyoro": "Mukama",
-    "english": "Be"
-  },
-  {
-    "runyoro": "Sabbunni",
-    "english": "Soap"
-  },
-  {
-    "runyoro": "Wakame",
-    "english": "Mr"
-  },
-  {
-    "runyoro": "Ehoima",
-    "english": "To"
-  },
-  {
-    "runyoro": "Taata",
-    "english": "Father"
-  },
-  {
-    "runyoro": "Bisereko",
-    "english": "The"
-  },
-  {
-    "runyoro": "Barwenda",
-    "english": "Attend"
-  },
-  {
-    "runyoro": "Bahemuka",
-    "english": "Last"
-  },
-  {
-    "runyoro": "Bisuma",
-    "english": "Great"
-  },
-  {
-    "runyoro": "Baraza",
-    "english": "Monday"
-  },
-  {
-    "runyoro": "Mugume",
-    "english": "It"
-  },
-  {
-    "runyoro": "Busaho",
-    "english": "Baifll"
-  },
-  {
-    "runyoro": "Wakame",
-    "english": "Something"
-  },
-  {
-    "runyoro": "Ligwa",
-    "english": "The"
-  },
-  {
-    "runyoro": "Namugongo",
-    "english": "He"
-  },
-  {
-    "runyoro": "Weewe",
-    "english": "Thou"
-  },
-  {
-    "runyoro": "Dora",
-    "english": "Look"
-  },
-  {
-    "runyoro": "Bakatutanga",
-    "english": "He"
-  },
-  {
-    "runyoro": "Ekijungu",
-    "english": "Somepeople"
-  },
-  {
-    "runyoro": "Otwana",
-    "english": "They"
-  },
-  {
-    "runyoro": "Ota",
-    "english": "Sir"
-  },
-  {
-    "runyoro": "Emererwa",
-    "english": "To"
-  },
-  {
-    "runyoro": "Kaabaleega",
-    "english": "King"
-  },
-  {
-    "runyoro": "Byenkya",
-    "english": "Byakunaga"
-  },
-  {
-    "runyoro": "Tabaarukya",
-    "english": "To"
-  },
-  {
     "runyoro": "Yesu",
     "english": "He"
-  },
-  {
-    "runyoro": "Wamara",
-    "english": "Name"
-  },
-  {
-    "runyoro": "Hitler",
-    "english": "Tusiime"
-  },
-  {
-    "runyoro": "Ruhanga",
-    "english": "The"
-  },
-  {
-    "runyoro": "Ruhanga",
-    "english": "Thoughts"
-  },
-  {
-    "runyoro": "Kyaka",
-    "english": "She"
-  },
-  {
-    "runyoro": "Rwakijuma",
-    "english": "Europe"
-  },
-  {
-    "runyoro": "Kasunganyanja",
-    "english": "Nikyetaaga"
-  },
-  {
-    "runyoro": "Sande",
-    "english": "If"
-  },
-  {
-    "runyoro": "Bukristaayo",
-    "english": "Christianity"
-  },
-  {
-    "runyoro": "Tooro",
-    "english": "Kampala"
-  },
-  {
-    "runyoro": "Endehwa",
-    "english": "Fine"
-  },
-  {
-    "runyoro": "Omukama",
-    "english": "When"
-  },
-  {
-    "runyoro": "Kyegegwa",
-    "english": "It"
-  },
-  {
-    "runyoro": "Ehotora",
-    "english": "To"
   },
   {
     "runyoro": "Encikinya",
     "english": "Flies"
   },
   {
-    "runyoro": "Mukama",
-    "english": "The"
+    "runyoro": "Ebabara",
+    "english": "To"
+  },
+  {
+    "runyoro": "Egema",
+    "english": "To"
+  },
+  {
+    "runyoro": "Baitu",
+    "english": "Yesterday"
+  },
+  {
+    "runyoro": "Eba",
+    "english": "To"
+  },
+  {
+    "runyoro": "Ehoza",
+    "english": "To"
+  },
+  {
+    "runyoro": "Hitler",
+    "english": "Tusiime"
+  },
+  {
+    "runyoro": "Eganyiirra",
+    "english": "Become"
+  },
+  {
+    "runyoro": "Tooro",
+    "english": "Kampala"
+  },
+  {
+    "runyoro": "Emyehurro",
+    "english": "Conceit"
+  },
+  {
+    "runyoro": "Ekwasa",
+    "english": "To"
+  },
+  {
+    "runyoro": "Egendera",
+    "english": "To"
   },
   {
     "runyoro": "Birikumwoha",
     "english": "He"
   },
   {
-    "runyoro": "Egenya",
+    "runyoro": "Endale",
+    "english": "Wild"
+  },
+  {
+    "runyoro": "Hima",
+    "english": "She"
+  },
+  {
+    "runyoro": "Bakatutanga",
+    "english": "He"
+  },
+  {
+    "runyoro": "Yesu",
+    "english": "Jesus"
+  },
+  {
+    "runyoro": "Wamara",
+    "english": "Name"
+  },
+  {
+    "runyoro": "Egiza",
     "english": "To"
   },
   {
-    "runyoro": "Embi",
-    "english": "Both"
+    "runyoro": "Emanya",
+    "english": "To"
+  },
+  {
+    "runyoro": "Empungira",
+    "english": "Sleeping"
+  },
+  {
+    "runyoro": "Emwa",
+    "english": "To"
+  },
+  {
+    "runyoro": "Mukama",
+    "english": "The"
+  },
+  {
+    "runyoro": "Ekubirana",
+    "english": "To"
+  },
+  {
+    "runyoro": "Wceb",
+    "english": "Beet"
+  },
+  {
+    "runyoro": "Ehinguliriza",
+    "english": "To"
+  },
+  {
+    "runyoro": "Endagalika",
+    "english": "Odd"
+  },
+  {
+    "runyoro": "Jeera",
+    "english": "To"
+  },
+  {
+    "runyoro": "Ejuura",
+    "english": "To"
+  },
+  {
+    "runyoro": "Buraya",
+    "english": "Europe"
+  },
+  {
+    "runyoro": "Empulirro",
+    "english": "Ear"
   },
   {
     "runyoro": "Jura",
+    "english": "To"
+  },
+  {
+    "runyoro": "Endobo",
+    "english": "Fish"
+  },
+  {
+    "runyoro": "Sabbunni",
+    "english": "Soap"
+  },
+  {
+    "runyoro": "Busaho",
+    "english": "Baifll"
+  },
+  {
+    "runyoro": "Enceke",
+    "english": "Weakly"
+  },
+  {
+    "runyoro": "Egarukamu",
+    "english": "To"
+  },
+  {
+    "runyoro": "Eragaza",
+    "english": "To"
+  },
+  {
+    "runyoro": "Emyekuniko",
+    "english": "Pride"
+  },
+  {
+    "runyoro": "Ekanga",
+    "english": "To"
+  },
+  {
+    "runyoro": "Emputa",
+    "english": "Wounded"
+  },
+  {
+    "runyoro": "Emyekuzo",
+    "english": "Conceit"
+  },
+  {
+    "runyoro": "Ehara",
+    "english": "To"
+  },
+  {
+    "runyoro": "Egogeza",
+    "english": "To"
+  },
+  {
+    "runyoro": "Vi",
+    "english": "Intensive"
+  },
+  {
+    "runyoro": "Sande",
+    "english": "Sunday"
+  },
+  {
+    "runyoro": "Eryato",
+    "english": "He"
+  },
+  {
+    "runyoro": "Mwenge",
+    "english": "He"
+  },
+  {
+    "runyoro": "Ehaisa",
+    "english": "To"
+  },
+  {
+    "runyoro": "Emyombekere",
+    "english": "Style"
+  },
+  {
+    "runyoro": "Empuku",
+    "english": "Weevil"
+  },
+  {
+    "runyoro": "Caali",
+    "english": "Expresses"
+  },
+  {
+    "runyoro": "Emyesungo",
+    "english": "Cheeky"
+  },
+  {
+    "runyoro": "Prime",
+    "english": "Put"
+  },
+  {
+    "runyoro": "Egambiirra",
+    "english": "To"
+  },
+  {
+    "runyoro": "Endeberwamu",
+    "english": "Looking"
+  },
+  {
+    "runyoro": "Bahemuka",
+    "english": "Last"
+  },
+  {
+    "runyoro": "Dora",
+    "english": "Look"
+  },
+  {
+    "runyoro": "Emanyisa",
+    "english": "To"
+  },
+  {
+    "runyoro": "Eoyuma",
+    "english": "Behind"
+  },
+  {
+    "runyoro": "Ebabura",
+    "english": "Of"
+  },
+  {
+    "runyoro": "Eganyira",
+    "english": "To"
+  },
+  {
+    "runyoro": "Endehwa",
+    "english": "Fine"
+  },
+  {
+    "runyoro": "Ehakana",
+    "english": "To"
+  },
+  {
+    "runyoro": "Ekumbya",
+    "english": "To"
+  },
+  {
+    "runyoro": "Ehemura",
+    "english": "To"
+  },
+  {
+    "runyoro": "Empunu",
+    "english": "Pig"
+  },
+  {
+    "runyoro": "Ehuuga",
+    "english": "To"
+  },
+  {
+    "runyoro": "Mugume",
+    "english": "It"
+  },
+  {
+    "runyoro": "Tabaarukya",
+    "english": "To"
+  },
+  {
+    "runyoro": "Tangiira",
+    "english": "To"
+  },
+  {
+    "runyoro": "Egoora",
+    "english": "To"
+  },
+  {
+    "runyoro": "Ekooka",
+    "english": "To"
+  },
+  {
+    "runyoro": "Endaade",
+    "english": "Large"
+  },
+  {
+    "runyoro": "Ebyohya",
+    "english": "To"
+  },
+  {
+    "runyoro": "Ekaranduza",
+    "english": "To"
+  },
+  {
+    "runyoro": "Ekuma",
+    "english": "To"
+  },
+  {
+    "runyoro": "Ehiringisa",
+    "english": "To"
+  },
+  {
+    "runyoro": "Ekopa",
+    "english": "To"
+  },
+  {
+    "runyoro": "Eceeba",
+    "english": "To"
+  },
+  {
+    "runyoro": "Sitaani",
+    "english": "Evil"
+  },
+  {
+    "runyoro": "Encompya",
+    "english": "Untrustworthy"
+  },
+  {
+    "runyoro": "Nyineeka",
+    "english": "The"
+  },
+  {
+    "runyoro": "Efuba",
+    "english": "To"
+  },
+  {
+    "runyoro": "Endambi",
+    "english": "Tapeworm"
+  },
+  {
+    "runyoro": "Ekuusa",
+    "english": "To"
+  },
+  {
+    "runyoro": "Eoyini",
+    "english": "Self"
+  },
+  {
+    "runyoro": "Endimi",
+    "english": "Languages"
+  },
+  {
+    "runyoro": "Ota",
+    "english": "Sir"
+  },
+  {
+    "runyoro": "Encu",
+    "english": "Fish"
+  },
+  {
+    "runyoro": "Efoora",
+    "english": "To"
+  },
+  {
+    "runyoro": "Endangaazi",
+    "english": "Hartebeest"
+  },
+  {
+    "runyoro": "Ebumbiirra",
+    "english": "To"
+  },
+  {
+    "runyoro": "Ekumba",
     "english": "To"
   },
   {
@@ -256,91 +720,251 @@
     "english": "England"
   },
   {
-    "runyoro": "Mukama",
-    "english": "Lord"
+    "runyoro": "Ebundaaza",
+    "english": "To"
   },
   {
-    "runyoro": "Ruhanga",
-    "english": "God"
+    "runyoro": "Endigito",
+    "english": "Sound"
   },
   {
-    "runyoro": "Omukama",
-    "english": "King"
+    "runyoro": "Egemba",
+    "english": "To"
   },
   {
-    "runyoro": "Ekitooro",
-    "english": "The"
+    "runyoro": "Emogora",
+    "english": "To"
   },
   {
-    "runyoro": "Waizikya",
-    "english": "Ogre"
+    "runyoro": "Adolf",
+    "english": "Luwero"
   },
   {
-    "runyoro": "Omuroleerezi",
-    "english": "The"
+    "runyoro": "Ehugya",
+    "english": "To"
   },
   {
-    "runyoro": "Tajeemerwa",
-    "english": "One"
+    "runyoro": "Edikya",
+    "english": "To"
   },
   {
-    "runyoro": "Wceb",
-    "english": "Beet"
+    "runyoro": "Weewe",
+    "english": "Thou"
   },
   {
-    "runyoro": "Prime",
-    "english": "Put"
+    "runyoro": "Ehonga",
+    "english": "To"
   },
   {
-    "runyoro": "Kampala",
-    "english": "His"
+    "runyoro": "Ebyahyaniza",
+    "english": "To"
   },
   {
-    "runyoro": "Eryato",
-    "english": "He"
-  },
-  {
-    "runyoro": "Empunu",
-    "english": "Pig"
-  },
-  {
-    "runyoro": "Vi",
-    "english": "Intensive"
-  },
-  {
-    "runyoro": "Cukanaho",
-    "english": "Get"
-  },
-  {
-    "runyoro": "Kiristo",
-    "english": "Christ"
-  },
-  {
-    "runyoro": "Tusiime",
-    "english": "Uganda"
-  },
-  {
-    "runyoro": "Nyineeka",
-    "english": "The"
-  },
-  {
-    "runyoro": "Abarukwiragura",
-    "english": "This"
-  },
-  {
-    "runyoro": "Sande",
-    "english": "Sunday"
-  },
-  {
-    "runyoro": "Oraire",
-    "english": "Good"
+    "runyoro": "Egesa",
+    "english": "To"
   },
   {
     "runyoro": "Tabaaza",
     "english": "To"
   },
   {
-    "runyoro": "Tangiira",
+    "runyoro": "Bwigara",
+    "english": "Expression"
+  },
+  {
+    "runyoro": "Eraga",
+    "english": "To"
+  },
+  {
+    "runyoro": "Waizikya",
+    "english": "Ogre"
+  },
+  {
+    "runyoro": "Ecencura",
+    "english": "To"
+  },
+  {
+    "runyoro": "Eganya",
+    "english": "To"
+  },
+  {
+    "runyoro": "Empurizana",
+    "english": "Communication"
+  },
+  {
+    "runyoro": "Kiristo",
+    "english": "Christ"
+  },
+  {
+    "runyoro": "Isebo",
+    "english": "They"
+  },
+  {
+    "runyoro": "Kaabaleega",
+    "english": "King"
+  },
+  {
+    "runyoro": "Epaoka",
+    "english": "To"
+  },
+  {
+    "runyoro": "Tajeemerwa",
+    "english": "One"
+  },
+  {
+    "runyoro": "Ekeehereza",
+    "english": "To"
+  },
+  {
+    "runyoro": "Ekulingilrra",
+    "english": "To"
+  },
+  {
+    "runyoro": "Endimiro",
+    "english": "Cultivated"
+  },
+  {
+    "runyoro": "Abarukwiragura",
+    "english": "This"
+  },
+  {
+    "runyoro": "Egonesa",
+    "english": "To"
+  },
+  {
+    "runyoro": "Jinja",
+    "english": "Kaabaleega"
+  },
+  {
+    "runyoro": "Ekuuyuuya",
+    "english": "To"
+  },
+  {
+    "runyoro": "Oraire",
+    "english": "Good"
+  },
+  {
+    "runyoro": "Cukanaho",
+    "english": "Get"
+  },
+  {
+    "runyoro": "Ekitooro",
+    "english": "The"
+  },
+  {
+    "runyoro": "Ebaarra",
+    "english": "To"
+  },
+  {
+    "runyoro": "Enderalera",
+    "english": "Lower"
+  },
+  {
+    "runyoro": "Ehenyenga",
+    "english": "Forge"
+  },
+  {
+    "runyoro": "Enegura",
+    "english": "To"
+  },
+  {
+    "runyoro": "Ecwacwana",
+    "english": "To"
+  },
+  {
+    "runyoro": "Bisuma",
+    "english": "The"
+  },
+  {
+    "runyoro": "Ecumiitiriza",
+    "english": "To"
+  },
+  {
+    "runyoro": "Ebiihabiiha",
+    "english": "To"
+  },
+  {
+    "runyoro": "Ehungura",
+    "english": "To"
+  },
+  {
+    "runyoro": "Baraza",
+    "english": "Monday"
+  },
+  {
+    "runyoro": "Ebwa",
+    "english": "To"
+  },
+  {
+    "runyoro": "Ebiijagura",
+    "english": "To"
+  },
+  {
+    "runyoro": "Egonyoorra",
+    "english": "To"
+  },
+  {
+    "runyoro": "Ekeerreema",
+    "english": "To"
+  },
+  {
+    "runyoro": "Ekuuma",
+    "english": "To"
+  },
+  {
+    "runyoro": "Empya",
+    "english": "Way"
+  },
+  {
+    "runyoro": "Emyehaahiro",
+    "english": "Boasting"
+  },
+  {
+    "runyoro": "Ebiihiirra",
+    "english": "To"
+  },
+  {
+    "runyoro": "Ekijungu",
+    "english": "Somepeople"
+  },
+  {
+    "runyoro": "Egejageja",
+    "english": "To"
+  },
+  {
+    "runyoro": "Ekukumika",
+    "english": "To"
+  },
+  {
+    "runyoro": "Ekugusa",
+    "english": "To"
+  },
+  {
+    "runyoro": "Endahiro",
+    "english": "Oath"
+  },
+  {
+    "runyoro": "Byenkya",
+    "english": "Byakunaga"
+  },
+  {
+    "runyoro": "Ebotoora",
+    "english": "To"
+  },
+  {
+    "runyoro": "Ekingira",
+    "english": "To"
+  },
+  {
+    "runyoro": "Ebairuka",
+    "english": "To"
+  },
+  {
+    "runyoro": "Kyegegwa",
+    "english": "It"
+  },
+  {
+    "runyoro": "Ekoonyera",
     "english": "To"
   }
 ]

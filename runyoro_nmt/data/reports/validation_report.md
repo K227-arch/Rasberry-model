@@ -2,13 +2,13 @@
 
 {
   "total_input": 3782,
-  "total_valid": 3779,
-  "total_rejected": 3,
+  "total_valid": 3774,
+  "total_rejected": 8,
   "rejection_breakdown": {
-    "Misalignment warning": 140,
-    "Duplicate": 3
+    "Misalignment warning": 133,
+    "Duplicate": 8
   },
-  "total_issues_logged": 403
+  "total_issues_logged": 3061
 }
 
 ## Issues

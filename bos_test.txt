@@ -1,0 +1,5 @@
+nyk_Latn BOS: ? How are you?
+No BOS: - Jak się masz? - Świetnie.
+eng_Latn BOS: - How are you? - I'm fine.
+lug_Latn BOS: Oli otya?
+rny->en (eng BOS): Oraire or?

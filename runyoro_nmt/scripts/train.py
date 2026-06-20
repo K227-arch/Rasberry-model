@@ -33,21 +33,23 @@ logger = logging.getLogger("train")
 
 # ── config ────────────────────────────────────────────────────────────────────
 import yaml
+
 with open(ROOT / "configs" / "config.yaml", encoding="utf-8") as f:
     config = yaml.safe_load(f)
 
-tc         = config["training"]
-mc         = config["model"]
+tc = config["training"]
+mc = config["model"]
 MODEL_NAME = mc["base_model_name"]
 OUTPUT_DIR = ROOT / tc["output_dir"]
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-NLLB_RNY   = mc["src_lang_nllb"]   # nyk_Latn — used as src_lang when encoding Runyoro
-NLLB_ENG   = mc["tgt_lang_nllb"]   # eng_Latn
-MAX_SRC    = mc["max_source_length"]
-MAX_TGT    = mc["max_target_length"]
+NLLB_RNY = mc["src_lang_nllb"]
+NLLB_ENG = mc["tgt_lang_nllb"]
+MAX_SRC = mc["max_source_length"]
+MAX_TGT = mc["max_target_length"]
 
-# nyk_Latn maps to <unk> (id=3) in NLLB — not a valid generation target.
-# Use lug_Latn (Luganda) as the Runyoro BOS token — closest supported Ugandan Bantu language.
+# NLLB does not natively support nyk_Latn (Nyankore/Runyoro token = id 3 = <unk>).
+# The NLLB BOS token for Runyoro target generation is lug_Latn (id 256110),
+# which is the closest Ugandan Bantu language in the NLLB vocabulary.
 NLLB_RNY_BOS = "lug_Latn"
 NLLB_ENG_BOS = "eng_Latn"
 
@@ -66,13 +68,18 @@ from transformers import (
 )
 import evaluate as hf_evaluate
 
-logger.info("PyTorch %s | CUDA %s | GPUs: %d",
-            torch.__version__, torch.version.cuda, torch.cuda.device_count())
+logger.info(
+    "PyTorch %s | CUDA %s | GPUs: %d",
+    torch.__version__,
+    torch.version.cuda,
+    torch.cuda.device_count(),
+)
 for i in range(torch.cuda.device_count()):
     p = torch.cuda.get_device_properties(i)
     logger.info("  GPU %d: %s  %.1f GB VRAM", i, p.name, p.total_memory / 1024**3)
 
 set_seed(config["data"].get("seed", 42))
+
 
 # ── data helpers ──────────────────────────────────────────────────────────────
 def load_tsv(path):
@@ -83,31 +90,38 @@ def load_tsv(path):
             pairs.append((parts[0].strip(), parts[1].strip()))
     return pairs
 
+
 # ── load splits ───────────────────────────────────────────────────────────────
 logger.info("Loading data splits...")
 train_pairs = load_tsv(ROOT / "data/processed/train.tsv")
-val_pairs   = load_tsv(ROOT / "data/processed/val.tsv")
-test_pairs  = load_tsv(ROOT / "data/processed/test.tsv")
-logger.info("  Train=%d  Val=%d  Test=%d",
-            len(train_pairs), len(val_pairs), len(test_pairs))
+val_pairs = load_tsv(ROOT / "data/processed/val.tsv")
+test_pairs = load_tsv(ROOT / "data/processed/test.tsv")
+logger.info(
+    "  Train=%d  Val=%d  Test=%d", len(train_pairs), len(val_pairs), len(test_pairs)
+)
 
 # ── tokenizer ─────────────────────────────────────────────────────────────────
 logger.info("Loading tokenizer: %s", MODEL_NAME)
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, token=HF_TOKEN)
 
-# Resolve forced BOS token IDs
-# IMPORTANT: nyk_Latn maps to id=3 (<unk>) — NOT a valid NLLB language token.
-# Use lug_Latn (Luganda, Uganda) as the Runyoro BOS — closest supported Bantu language.
-ENG_BOS_ID = tokenizer.convert_tokens_to_ids(NLLB_ENG_BOS)   # 256047
-RNY_BOS_ID = tokenizer.convert_tokens_to_ids(NLLB_RNY_BOS)   # 256110 (lug_Latn)
-logger.info("  %s bos_id=%d  |  %s bos_id=%d",
-            NLLB_ENG_BOS, ENG_BOS_ID, NLLB_RNY_BOS, RNY_BOS_ID)
+# BOS token IDs for generation
+ENG_BOS_ID = tokenizer.convert_tokens_to_ids(NLLB_ENG_BOS)
+RNY_BOS_ID = tokenizer.convert_tokens_to_ids(NLLB_RNY_BOS)
+logger.info(
+    "  %s bos_id=%d  |  %s bos_id=%d",
+    NLLB_ENG_BOS,
+    ENG_BOS_ID,
+    NLLB_RNY_BOS,
+    RNY_BOS_ID,
+)
+
 
 # ── tokenise fn ───────────────────────────────────────────────────────────────
 # When encoding the TARGET side:
 #   - For English targets  → use eng_Latn as src_lang (BOS = 256047)
-#   - For Runyoro targets  → use lug_Latn as src_lang (BOS = 256110)
-#     (nyk_Latn = id 3 = <unk>, so labels would all start with unk token)
+#   - For Runyoro targets  → use NLLB-supported BOS token (id = 256110)
+#     (nyk_Latn = id 3 = <unk> in the raw NLLB vocab, so we use the
+#      closest supported Ugandan Bantu language token instead)
 def make_tokenise_fn(src_lang, tgt_lang):
     # Map the target lang to a valid NLLB BOS language code
     tgt_bos_lang = NLLB_ENG_BOS if tgt_lang == NLLB_ENG else NLLB_RNY_BOS
@@ -132,13 +146,17 @@ def make_tokenise_fn(src_lang, tgt_lang):
         tokenizer.src_lang = src_lang  # restore
         src_enc["labels"] = tgt_enc["input_ids"]
         return src_enc
+
     return _fn
 
+
 def pairs_to_hf(pairs, src_lang, tgt_lang, desc=""):
-    raw = HFDataset.from_dict({
-        "src": [s for s, t in pairs],
-        "tgt": [t for s, t in pairs],
-    })
+    raw = HFDataset.from_dict(
+        {
+            "src": [s for s, t in pairs],
+            "tgt": [t for s, t in pairs],
+        }
+    )
     return raw.map(
         make_tokenise_fn(src_lang, tgt_lang),
         batched=True,
@@ -146,6 +164,7 @@ def pairs_to_hf(pairs, src_lang, tgt_lang, desc=""):
         desc=desc or f"{src_lang}->{tgt_lang}",
         load_from_cache_file=False,
     )
+
 
 # ── build bidirectional datasets ──────────────────────────────────────────────
 logger.info("Tokenising datasets (bidirectional)...")
@@ -156,9 +175,7 @@ train_rev = pairs_to_hf(
 train_ds = concatenate_datasets([train_fwd, train_rev]).shuffle(seed=42)
 
 val_fwd = pairs_to_hf(val_pairs, NLLB_RNY, NLLB_ENG, "Val rny->en")
-val_rev = pairs_to_hf(
-    [(t, s) for s, t in val_pairs], NLLB_ENG, NLLB_RNY, "Val en->rny"
-)
+val_rev = pairs_to_hf([(t, s) for s, t in val_pairs], NLLB_ENG, NLLB_RNY, "Val en->rny")
 val_ds = concatenate_datasets([val_fwd, val_rev])
 
 logger.info("  Train samples=%d  Val samples=%d", len(train_ds), len(val_ds))
@@ -170,26 +187,29 @@ model = AutoModelForSeq2SeqLM.from_pretrained(
     token=HF_TOKEN,
 )
 model = model.to(torch.bfloat16)
-logger.info("  Parameters: %.1f M  |  dtype: bfloat16",
-            sum(p.numel() for p in model.parameters()) / 1e6)
+logger.info(
+    "  Parameters: %.1f M  |  dtype: bfloat16",
+    sum(p.numel() for p in model.parameters()) / 1e6,
+)
 # transformers M2M100Decoder already patched by scripts/patch_transformers.py
 
 # ── metrics ───────────────────────────────────────────────────────────────────
 bleu_metric = hf_evaluate.load("sacrebleu")
 chrf_metric = hf_evaluate.load("chrf")
 
+
 def compute_metrics(eval_preds):
     preds, labels = eval_preds
     if isinstance(preds, tuple):
         preds = preds[0]
     # Replace -100 in preds too (can happen with padding)
-    preds  = [[max(t, 0) for t in seq] for seq in preds]
-    decoded_preds  = tokenizer.batch_decode(preds,  skip_special_tokens=True)
+    preds = [[max(t, 0) for t in seq] for seq in preds]
+    decoded_preds = tokenizer.batch_decode(preds, skip_special_tokens=True)
     # Replace -100 in labels (padding token)
-    clean_labels   = [[max(l, 0) for l in label] for label in labels]
+    clean_labels = [[max(l, 0) for l in label] for label in labels]
     decoded_labels = tokenizer.batch_decode(clean_labels, skip_special_tokens=True)
     # Strip whitespace
-    decoded_preds  = [p.strip() for p in decoded_preds]
+    decoded_preds = [p.strip() for p in decoded_preds]
     decoded_labels = [l.strip() for l in decoded_labels]
     try:
         bleu = bleu_metric.compute(
@@ -206,6 +226,7 @@ def compute_metrics(eval_preds):
         logger.warning("Metric computation failed: %s", e)
         return {"bleu": 0.0, "chrf": 0.0}
 
+
 # ── collator ──────────────────────────────────────────────────────────────────
 collator = DataCollatorForSeq2Seq(
     tokenizer, model=model, label_pad_token_id=-100, pad_to_multiple_of=8
@@ -214,6 +235,7 @@ collator = DataCollatorForSeq2Seq(
 # ── MLflow ────────────────────────────────────────────────────────────────────
 try:
     import mlflow
+
     mlflow.set_tracking_uri(str(ROOT / "experiments" / "mlruns"))
     mlflow.set_experiment("runyoro-nmt-v1")
     report_to = ["mlflow"]
@@ -223,45 +245,45 @@ except Exception:
 
 # ── training args ─────────────────────────────────────────────────────────────
 training_args = Seq2SeqTrainingArguments(
-    output_dir                  = str(OUTPUT_DIR),
-    num_train_epochs            = tc["num_train_epochs"],
-    per_device_train_batch_size = tc["per_device_train_batch_size"],
-    per_device_eval_batch_size  = tc["per_device_eval_batch_size"],
-    gradient_accumulation_steps = tc["gradient_accumulation_steps"],
-    learning_rate               = tc["learning_rate"],
-    warmup_steps                = tc["warmup_steps"],
-    weight_decay                = tc["weight_decay"],
-    lr_scheduler_type           = tc["lr_scheduler_type"],
-    bf16                        = False,   # model cast to bf16 manually; trainer flag triggers conflicting accelerate hooks
-    fp16                        = False,
-    save_strategy               = tc["save_strategy"],
-    eval_strategy               = tc["evaluation_strategy"],
-    load_best_model_at_end      = tc["load_best_model_at_end"],
-    metric_for_best_model       = tc["metric_for_best_model"],
-    greater_is_better           = tc["greater_is_better"],
-    logging_steps               = tc["logging_steps"],
-    save_total_limit            = tc["save_total_limit"],
-    predict_with_generate       = True,
-    generation_max_length       = tc["generation_max_length"],
-    generation_num_beams        = tc["generation_num_beams"],
-    label_smoothing_factor      = tc.get("label_smoothing_factor", 0.1),
-    dataloader_num_workers      = 0,
-    dataloader_pin_memory       = False,
-    report_to                   = report_to,
-    logging_dir                 = str(ROOT / "experiments" / "logs"),
-    run_name                    = "runyoro-nmt-v1",
+    output_dir=str(OUTPUT_DIR),
+    num_train_epochs=tc["num_train_epochs"],
+    per_device_train_batch_size=tc["per_device_train_batch_size"],
+    per_device_eval_batch_size=tc["per_device_eval_batch_size"],
+    gradient_accumulation_steps=tc["gradient_accumulation_steps"],
+    learning_rate=tc["learning_rate"],
+    warmup_steps=tc["warmup_steps"],
+    weight_decay=tc["weight_decay"],
+    lr_scheduler_type=tc["lr_scheduler_type"],
+    bf16=False,  # model cast to bf16 manually; trainer flag triggers conflicting accelerate hooks
+    fp16=False,
+    save_strategy=tc["save_strategy"],
+    eval_strategy=tc["evaluation_strategy"],
+    load_best_model_at_end=tc["load_best_model_at_end"],
+    metric_for_best_model=tc["metric_for_best_model"],
+    greater_is_better=tc["greater_is_better"],
+    logging_steps=tc["logging_steps"],
+    save_total_limit=tc["save_total_limit"],
+    predict_with_generate=True,
+    generation_max_length=tc["generation_max_length"],
+    generation_num_beams=tc["generation_num_beams"],
+    label_smoothing_factor=tc.get("label_smoothing_factor", 0.1),
+    dataloader_num_workers=0,
+    dataloader_pin_memory=False,
+    report_to=report_to,
+    logging_dir=str(ROOT / "experiments" / "logs"),
+    run_name="runyoro-nmt-v1",
 )
 
 # ── trainer ───────────────────────────────────────────────────────────────────
 trainer = Seq2SeqTrainer(
-    model           = model,
-    args            = training_args,
-    train_dataset   = train_ds,
-    eval_dataset    = val_ds,
-    processing_class= tokenizer,
-    data_collator   = collator,
-    compute_metrics = compute_metrics,
-    callbacks       = [EarlyStoppingCallback(early_stopping_patience=3)],
+    model=model,
+    args=training_args,
+    train_dataset=train_ds,
+    eval_dataset=val_ds,
+    processing_class=tokenizer,
+    data_collator=collator,
+    compute_metrics=compute_metrics,
+    callbacks=[EarlyStoppingCallback(early_stopping_patience=3)],
 )
 
 # ── Targeted fix for transformers 4.57.x + NLLB conflict ─────────────────────
@@ -270,10 +292,12 @@ trainer = Seq2SeqTrainer(
 # Strip decoder_inputs_embeds from every batch before the forward call.
 _orig_prepare = trainer._prepare_inputs
 
+
 def _safe_prepare_inputs(inputs):
     prepared = _orig_prepare(inputs)
     prepared.pop("decoder_inputs_embeds", None)
     return prepared
+
 
 trainer._prepare_inputs = _safe_prepare_inputs
 logger.info("Trainer._prepare_inputs patched to strip decoder_inputs_embeds")
@@ -281,24 +305,31 @@ logger.info("Trainer._prepare_inputs patched to strip decoder_inputs_embeds")
 # ── curriculum stages ─────────────────────────────────────────────────────────
 curriculum_cfg = tc.get("curriculum_learning", {})
 
+
 def get_curriculum_subset(pairs, src_lang, tgt_lang, max_tokens):
-    filtered = [(s, t) for s, t in pairs
-                if max(len(s.split()), len(t.split())) <= max_tokens]
+    filtered = [
+        (s, t) for s, t in pairs if max(len(s.split()), len(t.split())) <= max_tokens
+    ]
     if not filtered:
         return train_ds
     fwd = pairs_to_hf(filtered, src_lang, tgt_lang)
     rev = pairs_to_hf([(t, s) for s, t in filtered], tgt_lang, src_lang)
     return concatenate_datasets([fwd, rev]).shuffle(seed=42)
 
+
 # ── launch ────────────────────────────────────────────────────────────────────
 logger.info("=" * 60)
 logger.info("STARTING  runyoro-nmt-v1")
 logger.info("  Model     : %s", MODEL_NAME)
-logger.info("  GPUs      : %d x %s",
-            torch.cuda.device_count(), torch.cuda.get_device_name(0))
+logger.info(
+    "  GPUs      : %d x %s", torch.cuda.device_count(), torch.cuda.get_device_name(0)
+)
 logger.info("  Epochs    : %d", tc["num_train_epochs"])
-logger.info("  Batch     : %d x %d grad_accum",
-            tc["per_device_train_batch_size"], tc["gradient_accumulation_steps"])
+logger.info(
+    "  Batch     : %d x %d grad_accum",
+    tc["per_device_train_batch_size"],
+    tc["gradient_accumulation_steps"],
+)
 logger.info("  BF16      : %s", tc.get("bf16", True))
 logger.info("  Curriculum: %s", curriculum_cfg.get("enabled", False))
 logger.info("=" * 60)
@@ -306,9 +337,14 @@ logger.info("=" * 60)
 if curriculum_cfg.get("enabled"):
     for i, stage in enumerate(curriculum_cfg["stages"]):
         max_tok, stage_epochs = stage["max_tokens"], stage["epochs"]
-        logger.info("Curriculum %d/%d — max_tokens=%d  epochs=%d",
-                    i + 1, len(curriculum_cfg["stages"]), max_tok, stage_epochs)
-        trainer.train_dataset         = get_curriculum_subset(
+        logger.info(
+            "Curriculum %d/%d — max_tokens=%d  epochs=%d",
+            i + 1,
+            len(curriculum_cfg["stages"]),
+            max_tok,
+            stage_epochs,
+        )
+        trainer.train_dataset = get_curriculum_subset(
             train_pairs, NLLB_RNY, NLLB_ENG, max_tok
         )
         trainer.args.num_train_epochs = stage_epochs
@@ -328,7 +364,7 @@ logger.info("Saved to %s", OUTPUT_DIR)
 logger.info("Test-set evaluation (rny->en)...")
 test_ds = pairs_to_hf(test_pairs, NLLB_RNY, NLLB_ENG, "Test rny->en")
 test_res = trainer.predict(test_ds)
-metrics  = test_res.metrics
+metrics = test_res.metrics
 logger.info("TEST: %s", metrics)
 (ROOT / "data/reports/test_results.json").write_text(
     json.dumps(metrics, indent=2), encoding="utf-8"
@@ -390,10 +426,9 @@ print(tokenizer.decode(out[0], skip_special_tokens=True))
 # English -> Runyoro-Rutooro
 tokenizer.src_lang = "eng_Latn"
 inputs = tokenizer("How are you?", return_tensors="pt")
-# Use lug_Latn BOS (id=256110) — closest NLLB-supported Ugandan Bantu language
-# nyk_Latn maps to <unk> in NLLB vocab, so lug_Latn produces Runyoro-like output
-lug_bos = tokenizer.convert_tokens_to_ids("lug_Latn")
-out = model.generate(**inputs, forced_bos_token_id=lug_bos, num_beams=4)
+# Use NLLB BOS token for Runyoro target generation (closest supported Ugandan Bantu language)
+rny_bos = tokenizer.convert_tokens_to_ids(NLLB_RNY_BOS)
+out = model.generate(**inputs, forced_bos_token_id=rny_bos, num_beams=4)
 print(tokenizer.decode(out[0], skip_special_tokens=True))
 ```
 # Runyoro-Rutooro -> English
@@ -417,11 +452,11 @@ print(tokenizer.decode(out[0], skip_special_tokens=True))
 | Parameter | Value |
 |-----------|-------|
 | Base model | {MODEL_NAME} |
-| Epochs | {tc['num_train_epochs']} |
-| Batch size | {tc['per_device_train_batch_size']} x {tc['gradient_accumulation_steps']} grad_accum |
-| Learning rate | {tc['learning_rate']} |
-| BF16 | {tc.get('bf16', True)} |
-| Curriculum | {curriculum_cfg.get('enabled', False)} |
+| Epochs | {tc["num_train_epochs"]} |
+| Batch size | {tc["per_device_train_batch_size"]} x {tc["gradient_accumulation_steps"]} grad_accum |
+| Learning rate | {tc["learning_rate"]} |
+| BF16 | {tc.get("bf16", True)} |
+| Curriculum | {curriculum_cfg.get("enabled", False)} |
 | Hardware | 2x NVIDIA RTX 4090 (DataParallel) |
 """
 (OUTPUT_DIR / "README.md").write_text(card, encoding="utf-8")
@@ -430,9 +465,11 @@ print(tokenizer.decode(out[0], skip_special_tokens=True))
 logger.info("Pushing to kathay/runyoro-nmt-v1 ...")
 try:
     from huggingface_hub import HfApi
+
     save_model.push_to_hub(
-        "kathay/runyoro-nmt-v1", token=HF_TOKEN,
-        commit_message="runyoro-nmt-v1: trained weights"
+        "kathay/runyoro-nmt-v1",
+        token=HF_TOKEN,
+        commit_message="runyoro-nmt-v1: trained weights",
     )
     tokenizer.push_to_hub("kathay/runyoro-nmt-v1", token=HF_TOKEN)
     HfApi(token=HF_TOKEN).upload_file(

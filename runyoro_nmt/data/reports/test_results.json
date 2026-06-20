@@ -1,8 +1,8 @@
 {
-  "test_loss": 2.185546875,
-  "test_bleu": 18.77,
-  "test_chrf": 22.53,
-  "test_runtime": 11.0208,
-  "test_samples_per_second": 21.414,
-  "test_steps_per_second": 0.726
+  "test_loss": 3.986328125,
+  "test_bleu": 1.1,
+  "test_chrf": 11.0,
+  "test_runtime": 267.4792,
+  "test_samples_per_second": 0.845,
+  "test_steps_per_second": 0.03
 }

@@ -6,6 +6,7 @@ Deployed to: https://huggingface.co/spaces/kathay/runyoro-translator
 """
 
 import os
+import re
 import logging
 
 import gradio as gr  # type: ignore
@@ -18,14 +19,46 @@ logger = logging.getLogger("gradio_app")
 MODEL_ID = os.environ.get("MODEL_ID", "kathay/runyoro-nmt-v1")
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
+NLLB_RNY = "nyk_Latn"
+NLLB_ENG = "eng_Latn"
+
 logger.info("Loading model: %s on %s", MODEL_ID, DEVICE)
 tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
 model = AutoModelForSeq2SeqLM.from_pretrained(MODEL_ID).to(DEVICE)
+if tokenizer.convert_tokens_to_ids(NLLB_RNY) == tokenizer.unk_token_id:
+    lug_id = tokenizer.convert_tokens_to_ids("lug_Latn")
+    tokenizer.add_tokens([NLLB_RNY], special_tokens=True)
+    model.resize_token_embeddings(len(tokenizer))
+    nyk_id = tokenizer.convert_tokens_to_ids(NLLB_RNY)
+    with torch.no_grad():
+        model.get_input_embeddings().weight[nyk_id] = (
+            model.get_input_embeddings().weight[lug_id].clone()
+        )
+        model.get_output_embeddings().weight[nyk_id] = (
+            model.get_output_embeddings().weight[lug_id].clone()
+        )
+    logger.info("Added nyk_Latn token (id=%d) from lug_Latn embedding", nyk_id)
+
 model.eval()
 logger.info("Model ready")
 
-NLLB_RNY = "nyk_Latn"
-NLLB_ENG = "eng_Latn"
+# Regex to strip POS tags that leaked from training data
+# e.g. [GENERAL_NOUN], [COMMON_ANIMALS_NOUN], [MATHEMATICS_NOUN] etc.
+POS_TAG_RE = re.compile(r"\[[A-Z_]+\]\s*")
+
+
+def _clean_translation(text: str, tgt_lang: str) -> str:
+    """Post-process model output: strip POS tags, fix capitalisation."""
+    text = text.strip()
+    # Strip leaked POS tags like [GENERAL_NOUN], [GENERAL_VERB] etc.
+    text = POS_TAG_RE.sub("", text).strip()
+    # Strip leading hyphens sometimes prepended by the model
+    text = re.sub(r"^-\s*", "", text).strip()
+    # Capitalise English output
+    if tgt_lang == NLLB_ENG and text and text[0].islower():
+        text = text[0].upper() + text[1:]
+    return text
+
 
 EXAMPLES = [
     ["Runyoro → English", "Oraire ota?", ""],
@@ -46,9 +79,11 @@ def translate(text: str, direction: str) -> str:
     tgt_lang = NLLB_ENG if "Runyoro" in direction else NLLB_RNY
 
     tokenizer.src_lang = src_lang
-    forced_bos_id = tokenizer.lang_code_to_id[tgt_lang]
+    forced_bos_id = tokenizer.convert_tokens_to_ids(tgt_lang)
 
-    enc = tokenizer(text, return_tensors="pt", max_length=256, truncation=True).to(DEVICE)
+    enc = tokenizer(text, return_tensors="pt", max_length=256, truncation=True).to(
+        DEVICE
+    )
     with torch.no_grad():
         out = model.generate(
             **enc,
@@ -58,12 +93,7 @@ def translate(text: str, direction: str) -> str:
             length_penalty=1.0,
         )
     translation = tokenizer.decode(out[0], skip_special_tokens=True)
-
-    # Basic post-processing
-    translation = translation.strip()
-    if tgt_lang == NLLB_ENG and translation and translation[0].islower():
-        translation = translation[0].upper() + translation[1:]
-
+    translation = _clean_translation(translation, tgt_lang)
     return translation
 
 
@@ -85,7 +115,9 @@ h1 { color: var(--primary); font-weight: 700; }
 .gradio-container { max-width: 900px; margin: 0 auto; }
 """
 
-with gr.Blocks(css=CSS, title="AI Stick — Runyoro-Rutooro ↔ English Translator") as demo:
+with gr.Blocks(
+    css=CSS, title="AI Stick — Runyoro-Rutooro ↔ English Translator"
+) as demo:
     gr.HTML("""
         <div style="text-align:center; padding: 24px 0 8px;">
           <h1 style="font-size:32px; color:#070235; margin:0;">AI Stick</h1>

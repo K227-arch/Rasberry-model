@@ -20,22 +20,25 @@ from pathlib import Path
 
 HF_TOKEN = os.environ.get("HF_TOKEN", "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")
 
-MODEL_ID   = "kathay/runyoro-nmt-v1"
+MODEL_ID = "kathay/runyoro-nmt-v1"
 DATASET_ID = "kathay/runyoro-rutooro-en-parallel"
-SPACE_ID   = "kathay/runyoro-translator"
+SPACE_ID = "kathay/runyoro-translator"
 
 ROOT = Path(__file__).parent.parent
 
 # ── helpers ──────────────────────────────────────────────────────────────────
 
+
 def section(title):
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f"  {title}")
-    print('='*60)
+    print("=" * 60)
+
 
 # ── 1. login / API ────────────────────────────────────────────────────────────
 section("1. Authenticating")
 from huggingface_hub import HfApi, CommitOperationAdd, CommitOperationDelete
+
 api = HfApi(token=HF_TOKEN)
 me = api.whoami()
 print(f"  Logged in as: {me['name']}")
@@ -44,12 +47,14 @@ print(f"  Logged in as: {me['name']}")
 section("2. Creating / verifying repos")
 
 for repo_id, repo_type, sdk in [
-    (MODEL_ID,   "model",   None),
+    (MODEL_ID, "model", None),
     (DATASET_ID, "dataset", None),
-    (SPACE_ID,   "space",   "gradio"),
+    (SPACE_ID, "space", "gradio"),
 ]:
     try:
-        kwargs = dict(repo_id=repo_id, repo_type=repo_type, token=HF_TOKEN, exist_ok=True)
+        kwargs = dict(
+            repo_id=repo_id, repo_type=repo_type, token=HF_TOKEN, exist_ok=True
+        )
         if sdk:
             kwargs["space_sdk"] = sdk
         api.create_repo(**kwargs)
@@ -61,9 +66,10 @@ for repo_id, repo_type, sdk in [
 section("3. Uploading parallel dataset")
 
 train_tsv = ROOT / "data" / "processed" / "train.tsv"
-val_tsv   = ROOT / "data" / "processed" / "val.tsv"
-test_tsv  = ROOT / "data" / "processed" / "test.tsv"
-all_tsv   = ROOT / "data" / "augmented" / "all_pairs.tsv"
+val_tsv = ROOT / "data" / "processed" / "val.tsv"
+test_tsv = ROOT / "data" / "processed" / "test.tsv"
+all_tsv = ROOT / "data" / "augmented" / "all_pairs.tsv"
+
 
 def load_tsv(path):
     pairs = []
@@ -73,6 +79,7 @@ def load_tsv(path):
             if len(parts) == 2:
                 pairs.append((parts[0], parts[1]))
     return pairs
+
 
 # Build a dataset card
 dataset_card = """---
@@ -125,41 +132,56 @@ normalisation → augmentation (2×)
 # Write dataset card
 (ROOT / "data" / "processed" / "README.md").write_text(dataset_card, encoding="utf-8")
 
+
 # Convert TSVs to JSONL for easy HF dataset loading
 def tsv_to_jsonl(tsv_path, jsonl_path):
     pairs = load_tsv(tsv_path)
     with open(jsonl_path, "w", encoding="utf-8") as f:
         for rny, eng in pairs:
-            f.write(json.dumps({"runyoro_rutooro": rny, "english": eng}, ensure_ascii=False) + "\n")
+            f.write(
+                json.dumps({"runyoro_rutooro": rny, "english": eng}, ensure_ascii=False)
+                + "\n"
+            )
     return len(pairs)
+
 
 ops = []
 
-for split_name, tsv_path in [("train", train_tsv), ("validation", val_tsv), ("test", test_tsv)]:
+for split_name, tsv_path in [
+    ("train", train_tsv),
+    ("validation", val_tsv),
+    ("test", test_tsv),
+]:
     if tsv_path.exists():
         jsonl_path = tsv_path.with_suffix(".jsonl")
         n = tsv_to_jsonl(tsv_path, jsonl_path)
         print(f"  {split_name}: {n} pairs -> {jsonl_path.name}")
-        ops.append(CommitOperationAdd(
-            path_in_repo=f"data/{split_name}-00000-of-00001.jsonl",
-            path_or_fileobj=str(jsonl_path),
-        ))
+        ops.append(
+            CommitOperationAdd(
+                path_in_repo=f"data/{split_name}-00000-of-00001.jsonl",
+                path_or_fileobj=str(jsonl_path),
+            )
+        )
 
 # Also upload the raw cleaned TSV for full access
 if all_tsv.exists():
-    ops.append(CommitOperationAdd(
-        path_in_repo="data/all_pairs.tsv",
-        path_or_fileobj=str(all_tsv),
-    ))
+    ops.append(
+        CommitOperationAdd(
+            path_in_repo="data/all_pairs.tsv",
+            path_or_fileobj=str(all_tsv),
+        )
+    )
 
 # Dataset card
-ops.append(CommitOperationAdd(
-    path_in_repo="README.md",
-    path_or_fileobj=str(ROOT / "data" / "processed" / "README.md"),
-))
+ops.append(
+    CommitOperationAdd(
+        path_in_repo="README.md",
+        path_or_fileobj=str(ROOT / "data" / "processed" / "README.md"),
+    )
+)
 
 # Dataset loading script
-dataset_script = '''import datasets
+dataset_script = """import datasets
 
 _URLS = {
     "train": "data/train-00000-of-00001.jsonl",
@@ -187,13 +209,15 @@ class RunyoroEnglish(datasets.GeneratorBasedBuilder):
         with open(filepath, encoding="utf-8") as f:
             for i, line in enumerate(f):
                 yield i, json.loads(line)
-'''
+"""
 script_path = ROOT / "data" / "processed" / "runyoro_rutooro_en.py"
 script_path.write_text(dataset_script, encoding="utf-8")
-ops.append(CommitOperationAdd(
-    path_in_repo="runyoro_rutooro_en.py",
-    path_or_fileobj=str(script_path),
-))
+ops.append(
+    CommitOperationAdd(
+        path_in_repo="runyoro_rutooro_en.py",
+        path_or_fileobj=str(script_path),
+    )
+)
 
 try:
     api.create_commit(
@@ -213,13 +237,21 @@ section("4. Uploading linguistic resources")
 resource_ops = []
 tm_dir = ROOT / "data" / "tm"
 
-for fname in ["runyoro_en.tmx", "runyoro_en.tbx", "glossary.csv", "glossary.json", "named_entities.json"]:
+for fname in [
+    "runyoro_en.tmx",
+    "runyoro_en.tbx",
+    "glossary.csv",
+    "glossary.json",
+    "named_entities.json",
+]:
     fpath = tm_dir / fname
     if fpath.exists():
-        resource_ops.append(CommitOperationAdd(
-            path_in_repo=f"linguistic_resources/{fname}",
-            path_or_fileobj=str(fpath),
-        ))
+        resource_ops.append(
+            CommitOperationAdd(
+                path_in_repo=f"linguistic_resources/{fname}",
+                path_or_fileobj=str(fpath),
+            )
+        )
         print(f"  Queued: {fname}")
 
 if resource_ops:
@@ -241,13 +273,20 @@ section("5. Uploading pipeline reports")
 report_ops = []
 reports_dir = ROOT / "data" / "reports"
 
-for fname in ["validation_report.md", "cleaning_report.md", "augmentation_report.md", "pipeline_report.md"]:
+for fname in [
+    "validation_report.md",
+    "cleaning_report.md",
+    "augmentation_report.md",
+    "pipeline_report.md",
+]:
     fpath = reports_dir / fname
     if fpath.exists():
-        report_ops.append(CommitOperationAdd(
-            path_in_repo=f"pipeline_reports/{fname}",
-            path_or_fileobj=str(fpath),
-        ))
+        report_ops.append(
+            CommitOperationAdd(
+                path_in_repo=f"pipeline_reports/{fname}",
+                path_or_fileobj=str(fpath),
+            )
+        )
         print(f"  Queued: {fname}")
 
 if report_ops:
@@ -301,7 +340,7 @@ Bunyoro-Kitara & Tooro kingdoms) and **English**.
 
 ## Live Demo
 
-Try it at the [Hugging Face Space]({f'https://huggingface.co/spaces/{SPACE_ID}'}).
+Try it at the [Hugging Face Space]({f"https://huggingface.co/spaces/{SPACE_ID}"}).
 
 ## Training Data
 
@@ -339,7 +378,7 @@ tokenizer.src_lang = "nyk_Latn"
 inputs = tokenizer("Oraire ota?", return_tensors="pt")
 translated = model.generate(
     **inputs,
-    forced_bos_token_id=tokenizer.lang_code_to_id["eng_Latn"],
+    forced_bos_token_id=tokenizer.convert_tokens_to_ids("eng_Latn"),
     num_beams=4,
 )
 print(tokenizer.batch_decode(translated, skip_special_tokens=True))
@@ -350,11 +389,15 @@ tokenizer.src_lang = "eng_Latn"
 inputs = tokenizer("How are you?", return_tensors="pt")
 translated = model.generate(
     **inputs,
-    forced_bos_token_id=tokenizer.lang_code_to_id["nyk_Latn"],
+    forced_bos_token_id=tokenizer.convert_tokens_to_ids("nyk_Latn"),
     num_beams=4,
 )
 print(tokenizer.batch_decode(translated, skip_special_tokens=True))
 ```
+> **Note:** `nyk_Latn` is not a native NLLB language token — it is added at
+> inference time via `tokenizer.add_tokens()` and its embedding is initialized
+> from `lug_Latn` (the closest Ugandan Bantu language in NLLB). After
+> runyoro-nmt-v2 training, `nyk_Latn` will be used natively.
 
 ## Evaluation Metrics
 
@@ -425,8 +468,10 @@ app_content = app_content.replace(
 space_app.write_text(app_content, encoding="utf-8")
 
 space_ops = [
-    CommitOperationAdd(path_in_repo="app.py",           path_or_fileobj=str(space_app)),
-    CommitOperationAdd(path_in_repo="requirements.txt", path_or_fileobj=str(space_reqs)),
+    CommitOperationAdd(path_in_repo="app.py", path_or_fileobj=str(space_app)),
+    CommitOperationAdd(
+        path_in_repo="requirements.txt", path_or_fileobj=str(space_reqs)
+    ),
 ]
 
 # Space README
@@ -452,7 +497,9 @@ Dataset: [{DATASET_ID}](https://huggingface.co/datasets/{DATASET_ID})
 """
 space_readme_path = ROOT / "ui" / "SPACE_README.md"
 space_readme_path.write_text(space_readme, encoding="utf-8")
-space_ops.append(CommitOperationAdd(path_in_repo="README.md", path_or_fileobj=str(space_readme_path)))
+space_ops.append(
+    CommitOperationAdd(path_in_repo="README.md", path_or_fileobj=str(space_readme_path))
+)
 
 try:
     api.create_commit(

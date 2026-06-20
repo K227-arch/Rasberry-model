@@ -1,6 +1,6 @@
 # runyoro-nmt-v1 — Pipeline Report
 
-**Generated:** 2026-06-18T00:55:33.282555Z
+**Generated:** 2026-06-19T10:58:15.665731Z
 
 ---
 ## Data Extraction
@@ -13,14 +13,14 @@
 | Metric | Value |
 |--------|-------|
 | total_input | 3782 |
-| total_valid | 3779 |
-| total_rejected | 3 |
-| rejection_breakdown | {'Misalignment warning': 140, 'Duplicate': 3} |
-| total_issues_logged | 403 |
+| total_valid | 3774 |
+| total_rejected | 8 |
+| rejection_breakdown | {'Misalignment warning': 133, 'Duplicate': 8} |
+| total_issues_logged | 3061 |
 
 ## Cleaning
 
-**Pairs after cleaning:** 3779
+**Pairs after cleaning:** 3774
 
 ## Linguistic Resources
 
@@ -34,6 +34,6 @@
 
 | Split | Count |
 |-------|-------|
-| Train | 3996 |
-| Val | 470 |
-| Test | 236 |
+| Train | 3842 |
+| Val | 452 |
+| Test | 226 |

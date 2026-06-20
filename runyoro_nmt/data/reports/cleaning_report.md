@@ -1,15 +1,15 @@
 # Data Cleaning Report
 
-**Total pairs processed:** 3779
-**Pairs modified:** 323 (8.5%)
+**Total pairs processed:** 3774
+**Pairs modified:** 2932 (77.7%)
 
 ## Change Type Breakdown
 
 | Change Type | Count |
 |-------------|-------|
-| `eng:fix_capitalisation` | 233 |
-| `eng:normalise_punctuation` | 88 |
-| `eng:strip_numbering` | 9 |
+| `eng:fix_capitalisation` | 2899 |
+| `eng:normalise_punctuation` | 37 |
+| `eng:strip_numbering` | 10 |
 | `strip_numbering` | 7 |
 | `normalise_quotes` | 3 |
 | `eng:normalise_quotes` | 2 |

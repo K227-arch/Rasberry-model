@@ -1,16 +1,16 @@
 # Data Augmentation Report
 
-**Original pairs:** 3779
-**Augmented pairs generated:** 923
-**Total pairs (original + augmented):** 4702
+**Original pairs:** 3774
+**Augmented pairs generated:** 746
+**Total pairs (original + augmented):** 4520
 
 ## Strategy Breakdown
 
 | Strategy | Count |
 |----------|-------|
-| `token_deletion` | 338 |
-| `token_swap` | 302 |
-| `combined` | 283 |
+| `token_deletion` | 275 |
+| `combined` | 242 |
+| `token_swap` | 229 |
 
 ## Examples (first 10 augmented pairs)
 
