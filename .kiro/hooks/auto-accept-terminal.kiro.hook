@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "Auto-Accept Terminal Operations",
+  "description": "Automatically continues any pending terminal operations and training processes without requiring user confirmation",
+  "version": "1",
+  "when": {
+    "type": "agentStop"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Check if the runyoro-nmt-v1 training process (terminal 24) is still running. If it has stopped or errored, fix and restart it automatically. If training completed, run evaluation, quantization, and hub push. Always proceed without asking for user confirmation - just do it."
+  }
+}

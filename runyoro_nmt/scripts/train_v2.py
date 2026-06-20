@@ -19,6 +19,7 @@ from pathlib import Path
 
 os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
 os.environ.setdefault("HF_TOKEN", "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")
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 HF_TOKEN = os.environ["HF_TOKEN"]
 
 ROOT = Path(__file__).parent.parent
@@ -172,7 +173,8 @@ else:
     logger.info("Loading base model: %s", MODEL_NAME)
     model = AutoModelForSeq2SeqLM.from_pretrained(MODEL_NAME, token=HF_TOKEN)
 
-model = model.to(torch.bfloat16)
+device = torch.device("cuda:0")
+model = model.to(device, dtype=torch.bfloat16)
 logger.info("  Parameters: %.1f M", sum(p.numel() for p in model.parameters()) / 1e6)
 
 if torch.cuda.is_available():
@@ -232,10 +234,6 @@ def compute_metrics(eval_preds):
 if hasattr(model, "module"):
     model = model.module
 
-# Enable gradient checkpointing to reduce memory
-model.gradient_checkpointing_enable()
-logger.info("Gradient checkpointing enabled")
-
 # ── Collator ──────────────────────────────────────────────────
 collator = DataCollatorForSeq2Seq(
     tokenizer, model=model, label_pad_token_id=-100, pad_to_multiple_of=8
@@ -245,8 +243,8 @@ collator = DataCollatorForSeq2Seq(
 training_args = Seq2SeqTrainingArguments(
     output_dir=str(OUTPUT_DIR),
     num_train_epochs=tc["num_train_epochs"],
-    per_device_train_batch_size=8,
-    per_device_eval_batch_size=8,
+    per_device_train_batch_size=16,
+    per_device_eval_batch_size=16,
     gradient_accumulation_steps=tc["gradient_accumulation_steps"],
     learning_rate=tc["learning_rate"],
     warmup_steps=tc["warmup_steps"],

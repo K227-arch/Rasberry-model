@@ -1,21 +1,26 @@
 "use client";
 
+import Link from "next/link";
+
 export default function TopAppBar() {
   return (
-    <header className="bg-surface sticky top-0 z-40 shadow-sm">
-      <div className="flex justify-between items-center w-full px-5 py-2 max-w-screen-xl mx-auto">
-        <div className="flex items-center gap-3">
-          <span className="material-symbols-outlined text-primary text-[32px]">stylus</span>
-          <h1 className="text-[32px] font-bold text-primary tracking-tight leading-tight">
-            AI Stick
-          </h1>
-        </div>
-        <div className="flex items-center gap-4">
-          <button className="active:scale-95 duration-200 hover:bg-surface-container transition-colors rounded-full p-1 cursor-pointer">
-            <span className="material-symbols-outlined text-primary">settings</span>
-          </button>
-          <div className="h-10 w-10 rounded-full bg-primary-fixed overflow-hidden ring-2 ring-primary-container flex items-center justify-center text-primary font-bold">
-            <span className="material-symbols-outlined text-on-primary-fixed">person</span>
+    // Mobile only — desktop uses the Sidebar
+    <header className="bg-surface-bright shadow-sm fixed top-0 w-full z-40 md:hidden">
+      <div className="flex justify-between items-center px-margin-mobile h-16">
+        <Link href="/" className="flex items-center gap-2">
+          <span className="material-symbols-outlined text-primary text-[30px]">stylus</span>
+          <h1 className="text-display-lg text-primary leading-tight">AI Stick</h1>
+        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/settings"
+            className="p-2 rounded-full hover:bg-surface-container transition-colors"
+            aria-label="Settings"
+          >
+            <span className="material-symbols-outlined text-primary text-[22px]">settings</span>
+          </Link>
+          <div className="w-9 h-9 rounded-full bg-primary-container flex items-center justify-center ring-2 ring-primary-container">
+            <span className="material-symbols-outlined text-on-primary-container text-[20px]">person</span>
           </div>
         </div>
       </div>

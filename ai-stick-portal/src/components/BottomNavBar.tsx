@@ -3,69 +3,44 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const NAV_ITEMS: {
-  label: string;
-  icon: string;
-  href: string;
-  fillIcon?: string;
-}[] = [
-  {
-    label: "Home",
-    icon: "home",
-    href: "/",
-    fillIcon: "home",
-  },
-  {
-    label: "Translate",
-    icon: "translate",
-    href: "/translate",
-  },
-  {
-    label: "Chat",
-    icon: "chat_bubble",
-    href: "/chat",
-  },
-  {
-    label: "Editor",
-    icon: "description",
-    href: "/editor",
-  },
-];
+const NAV_ITEMS = [
+  { label: "Home",       icon: "home",       href: "/",           fillIcon: "home"       },
+  { label: "Translate",  icon: "g_translate", href: "/translate",  fillIcon: "g_translate"},
+  { label: "Chat",       icon: "chat_bubble", href: "/chat",       fillIcon: "chat_bubble"},
+  { label: "Dictionary", icon: "menu_book",   href: "/dictionary", fillIcon: "menu_book"  },
+  { label: "History",    icon: "history",     href: "/history",    fillIcon: "history"    },
+] as const;
 
 export default function BottomNavBar() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 w-full z-50 bg-surface-container-lowest shadow-[0_-8px_24px_rgba(7,2,53,0.08)] rounded-t-xl md:hidden">
-      <div className="flex justify-around items-center px-4 py-3">
-        {NAV_ITEMS.map((item) => {
-          const isActive = pathname === item.href;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex flex-col items-center gap-1 transition-all active:scale-90 ${
-                isActive
-                  ? "bg-secondary-container text-on-secondary-container rounded-full px-5 py-1"
-                  : "text-on-surface-variant opacity-70 hover:bg-surface-container-high rounded-xl p-1"
-              }`}
-            >
-              <span
-                className="material-symbols-outlined"
-                style={
-                  isActive && item.fillIcon
-                    ? { fontVariationSettings: "'FILL' 1" }
-                    : undefined
-                }
+    <nav className="fixed bottom-0 left-0 w-full z-50 md:hidden">
+      <div className="bg-surface-container-lowest shadow-[0_-8px_24px_rgba(93,64,55,0.08)] rounded-t-xl">
+        <div className="flex justify-around items-center px-2 py-2 pb-safe">
+          {NAV_ITEMS.map((item) => {
+            const isActive = pathname === item.href;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex flex-col items-center gap-0.5 transition-all active:scale-90 px-2 py-1 ${
+                  isActive
+                    ? "bg-primary-fixed text-on-primary-fixed rounded-full px-4"
+                    : "text-on-surface-variant opacity-70 hover:bg-surface-container-high rounded-xl"
+                }`}
               >
-                {item.icon}
-              </span>
-              <span className="text-[11px] font-semibold tracking-wider uppercase">
-                {item.label}
-              </span>
-            </Link>
-          );
-        })}
+                <span
+                  className="material-symbols-outlined text-[22px]"
+                  style={isActive ? { fontVariationSettings: "'FILL' 1" } : undefined}
+                >
+                  {isActive ? item.fillIcon : item.icon}
+                </span>
+                <span className="text-label-sm">{item.label}</span>
+              </Link>
+            );
+          })}
+        </div>
       </div>
     </nav>
   );

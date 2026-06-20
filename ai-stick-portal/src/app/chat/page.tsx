@@ -19,8 +19,7 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content:
-        'In Runyoro-Rutooro, you would say:\n\n**"Eizooba nirirasa ha nsozi."**',
+      content: 'In Runyoro-Rutooro, you would say:\n\n**"Eizooba nirirasa ha nsozi."**',
       lang: "RU",
     },
     {
@@ -33,8 +32,7 @@ export default function ChatPage() {
     },
     {
       role: "assistant",
-      content:
-        'You\'re very welcome! (You said: "Thank you very much for helping me"). Is there anything else you\'d like to translate?',
+      content: 'You\'re very welcome! (You said: "Thank you very much for helping me"). Is there anything else you\'d like to translate?',
       lang: "EN",
     },
   ]);
@@ -93,29 +91,23 @@ export default function ChatPage() {
     }
   };
 
-  const getGreeting = () => {
-    const h = new Date().getHours();
-    if (h < 12) return "Good Morning";
-    if (h < 18) return "Good Afternoon";
-    return "Good Evening";
-  };
-
   return (
     <>
       <TopAppBar />
       <div className="w-full h-1 bg-surface-container overflow-hidden">
-        <div className="h-full bg-secondary-container w-1/3 animate-pulse" />
+        <div className="h-full bg-primary-container w-1/3 animate-pulse" />
       </div>
-      <main className="flex-1 flex flex-col max-w-screen-xl mx-auto w-full px-5 py-6 gap-6 pb-36">
+      <main className="flex-1 flex flex-col max-w-screen-xl mx-auto w-full px-margin-mobile py-6 gap-6 pb-36">
+        {/* Language Toggle */}
         <div className="flex justify-center gap-3 sticky top-20 z-40">
-          <div className="bg-surface-container-highest/80 backdrop-blur-md p-1 rounded-full flex gap-1 shadow-sm">
+          <div className="glass-card p-1 rounded-full flex gap-1 premium-shadow">
             {LANGUAGES.map((lang) => (
               <button
                 key={lang}
                 onClick={() => setActiveLang(lang)}
-                className={`px-4 py-1.5 rounded-full text-[13px] font-semibold tracking-wider uppercase transition-all cursor-pointer ${
+                className={`px-4 py-1.5 rounded-full text-label-md font-semibold tracking-wider uppercase transition-all cursor-pointer ${
                   activeLang === lang
-                    ? "bg-secondary text-on-secondary"
+                    ? "bg-primary text-on-primary"
                     : "hover:bg-surface-container-high text-on-surface-variant"
                 }`}
               >
@@ -125,13 +117,14 @@ export default function ChatPage() {
           </div>
         </div>
 
+        {/* Messages */}
         <div className="flex flex-col gap-4">
           {messages.map((msg, i) => (
             <div key={i}>
               {msg.role === "user" ? (
                 <div className="flex flex-col items-end gap-1 max-w-[85%] self-end ml-auto">
                   {msg.isAudio ? (
-                    <div className="bg-primary text-on-primary p-4 rounded-xl rounded-tr-none shadow-sm flex items-center gap-3">
+                    <div className="bg-primary text-on-primary p-4 rounded-xl rounded-tr-none premium-shadow flex items-center gap-3">
                       <span
                         className="material-symbols-outlined"
                         style={{ fontVariationSettings: "'FILL' 1" }}
@@ -139,24 +132,24 @@ export default function ChatPage() {
                         mic
                       </span>
                       <div className="flex flex-col">
-                        <span className="text-[16px]">Audio message • {msg.duration}</span>
-                        <span className="text-xs text-primary-fixed-dim italic">
+                        <span className="text-body-sm">Audio message • {msg.duration}</span>
+                        <span className="text-label-sm text-primary-fixed-dim italic">
                           &ldquo;{msg.original}&rdquo;
                         </span>
                       </div>
                     </div>
                   ) : (
-                    <div className="bg-primary text-on-primary p-4 rounded-xl rounded-tr-none shadow-sm text-[16px]">
+                    <div className="bg-primary text-on-primary p-4 rounded-xl rounded-tr-none premium-shadow text-body-md">
                       {msg.content}
                     </div>
                   )}
-                  <span className="text-on-surface-variant text-[13px] font-semibold tracking-wider mr-1">
+                  <span className="text-on-surface-variant text-label-md font-semibold tracking-wider mr-1">
                     {msg.lang}
                   </span>
                 </div>
               ) : (
                 <div className="flex flex-col items-start gap-1 max-w-[85%] self-start">
-                  <div className="bg-surface-container-lowest border border-outline-variant p-4 rounded-xl rounded-tl-none shadow-lg text-[16px] flex flex-col gap-3">
+                  <div className="bg-surface-container-lowest border border-outline-variant p-4 rounded-xl rounded-tl-none premium-shadow-lg text-body-md flex flex-col gap-3">
                     {msg.content === "Thinking..." ? (
                       <div className="flex items-center gap-2 text-outline">
                         <span className="material-symbols-outlined animate-spin">
@@ -184,7 +177,7 @@ export default function ChatPage() {
                       </>
                     )}
                   </div>
-                  <span className="text-on-surface-variant text-[13px] font-semibold tracking-wider ml-1">
+                  <span className="text-on-surface-variant text-label-md font-semibold tracking-wider ml-1">
                     {msg.lang}
                   </span>
                 </div>
@@ -194,10 +187,11 @@ export default function ChatPage() {
         </div>
       </main>
 
+      {/* Input Bar */}
       <div className="fixed bottom-0 left-0 w-full z-50">
-        <div className="max-w-screen-xl mx-auto px-5 pb-4">
-          <div className="bg-surface-container-lowest rounded-xl shadow-[0_-8px_24px_rgba(7,2,53,0.08)] border border-outline-variant p-3 flex items-end gap-3">
-            <button className="text-on-surface-variant hover:bg-surface-container transition-all rounded-lg active:scale-90 p-3 cursor-pointer">
+        <div className="max-w-screen-xl mx-auto px-margin-mobile pb-4">
+          <div className="bg-surface-container-lowest rounded-xl shadow-[0_-8px_24px_rgba(93,64,55,0.08)] border border-outline-variant p-3 flex items-end gap-3">
+            <button className="text-on-surface-variant hover:bg-surface-container transition-all rounded-lg active:scale-90 p-3 cursor-pointer" aria-label="Add">
               <span className="material-symbols-outlined">add_circle</span>
             </button>
             <div className="flex-1 relative">
@@ -210,13 +204,13 @@ export default function ChatPage() {
                     sendMessage();
                   }
                 }}
-                className="w-full bg-surface-container-low border-none rounded-lg py-3 px-4 text-on-surface text-[16px] focus:ring-2 focus:ring-secondary resize-none outline-none"
+                className="w-full bg-surface-container-low border-none rounded-lg py-3 px-4 text-on-surface text-body-md focus:ring-2 focus:ring-primary resize-none outline-none"
                 placeholder="Type or speak a message..."
                 rows={1}
               />
             </div>
             <div className="flex gap-1">
-              <button className="p-3 bg-secondary-container text-on-secondary-container rounded-lg hover:bg-secondary-fixed transition-all active:scale-90 cursor-pointer">
+              <button className="p-3 bg-secondary-container text-on-secondary-container rounded-lg hover:bg-secondary-fixed transition-all active:scale-90 cursor-pointer" aria-label="Voice">
                 <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>
                   mic
                 </span>
@@ -224,6 +218,7 @@ export default function ChatPage() {
               <button
                 onClick={sendMessage}
                 className="p-3 bg-primary text-on-primary rounded-lg hover:opacity-90 transition-all active:scale-90 cursor-pointer"
+                aria-label="Send"
               >
                 <span className="material-symbols-outlined">send</span>
               </button>
