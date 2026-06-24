@@ -38,6 +38,7 @@ model:
 # -----------------------------------------------------------------------------
 data:
   raw_files:
+    # Original data
     - "../raw data/Agriculture Seed Vocabulary.csv.xlsx"
     - "../raw data/augmentted pos pairs.xlsx"
     - "../raw data/Ff_fixed worked on.docx"
@@ -46,6 +47,14 @@ data:
     - "../raw data/U_fixed ...docx"
     - "../raw data/V_fixed worked on.docx"
     - "../raw data/W_fixed worked on.docx"
+    # New2 data
+    - "../raw data/new 2/AAaaa_Fixed worked on.docx"
+    - "../raw data/new 2/augmented pos pairs 2.xlsx"
+    - "../raw data/new 2/GG_fixed worked on.docx"
+    - "../raw data/new 2/H_fixed worked on.docx"
+    - "../raw data/new 2/P_fixed worked on.docx"
+    - "../raw data/new 2/Runyoro rutoro dictionary letter A.xlsx"
+    - "../raw data/new 2/Y_fixed worked on.docx"
   processed_dir: "./data/processed"
   augmented_dir: "./data/augmented"
   tm_dir: "./data/tm"

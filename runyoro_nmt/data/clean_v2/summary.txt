@@ -1,0 +1,12 @@
+Clean V2 Dataset Summary
+========================================
+
+Sources:
+  Sentence & Word sentences: 4743
+  Sentence & Word words: 4152
+  New2 cleaned: 10653
+  Existing processed: 12740
+
+After dedup: 25832 total pairs
+  Sentence pairs (2+ words each side): 11442
+  Word pairs: 14390

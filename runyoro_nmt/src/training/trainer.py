@@ -78,11 +78,43 @@ class NMTTrainer:
         base_model = model_cfg["base_model_name"]
         output_dir = self.config["training"]["output_dir"]
 
+        # === Clear GPU memory before loading model ===
+        import gc
+        gc.collect()
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+            torch.cuda.reset_peak_memory_stats()
+            num_gpus = torch.cuda.device_count()
+            logger.info("Clearing GPU memory. %d GPU(s) available:", num_gpus)
+            for i in range(num_gpus):
+                free_mem = torch.cuda.get_device_properties(i).total_memory - torch.cuda.memory_reserved(i)
+                logger.info("  GPU %d: %s — %.1f GB free",
+                            i, torch.cuda.get_device_name(i), free_mem / 1e9)
+
         logger.info("Loading tokenizer: %s", base_model)
         self.tokenizer = AutoTokenizer.from_pretrained(base_model)
 
         logger.info("Loading model: %s", base_model)
-        self.model = AutoModelForSeq2SeqLM.from_pretrained(base_model)
+        # Use device_map="auto" to split model across both GPUs
+        # This is more efficient than DataParallel on Windows WDDM
+        num_gpus = torch.cuda.device_count() if torch.cuda.is_available() else 0
+        if num_gpus >= 2:
+            # Reserve memory for optimizer states and activations
+            max_memory = {i: "20GiB" for i in range(num_gpus)}
+            self.model = AutoModelForSeq2SeqLM.from_pretrained(
+                base_model,
+                torch_dtype=torch.bfloat16,
+                device_map="auto",
+                max_memory=max_memory,
+            )
+            logger.info("Model loaded with device_map='auto' across %d GPUs", num_gpus)
+            logger.info("Device map: %s", self.model.hf_device_map)
+        else:
+            self.model = AutoModelForSeq2SeqLM.from_pretrained(
+                base_model,
+                torch_dtype=torch.bfloat16,
+            )
+            logger.info("Model loaded on single device")
 
         logger.info(
             "Model loaded. Parameters: %s M",
@@ -121,6 +153,7 @@ class NMTTrainer:
 
     def _tokenise_fn(self, examples, src_lang: str, tgt_lang: str):
         self.tokenizer.src_lang = src_lang
+        self.tokenizer.tgt_lang = tgt_lang
         model_inputs = self.tokenizer(
             examples["src"],
             max_length=self.config["model"]["max_source_length"],
@@ -183,30 +216,44 @@ class NMTTrainer:
         )
         val_ds = concatenate_datasets([val_ds_fwd, val_ds_rev])
 
-        # Training arguments
+        # Training arguments — configured for 2x RTX 4090 with model parallelism
         training_args = Seq2SeqTrainingArguments(
             output_dir=train_cfg["output_dir"],
             num_train_epochs=train_cfg["num_train_epochs"],
-            per_device_train_batch_size=train_cfg["per_device_train_batch_size"],
-            per_device_eval_batch_size=train_cfg["per_device_eval_batch_size"],
-            gradient_accumulation_steps=train_cfg["gradient_accumulation_steps"],
+            per_device_train_batch_size=8,    # Conservative for model parallelism
+            per_device_eval_batch_size=8,
+            gradient_accumulation_steps=8,     # Effective batch = 8*8 = 64
             learning_rate=train_cfg["learning_rate"],
             warmup_steps=train_cfg["warmup_steps"],
             weight_decay=train_cfg["weight_decay"],
             lr_scheduler_type=train_cfg["lr_scheduler_type"],
-            fp16=train_cfg.get("fp16", False),
-            save_strategy=train_cfg["save_strategy"],
-            evaluation_strategy=train_cfg["evaluation_strategy"],
-            load_best_model_at_end=train_cfg["load_best_model_at_end"],
+            fp16=False,
+            bf16=True,  # Use bf16 on RTX 4090 for memory efficiency
+            bf16_full_eval=True,  # Keep eval in bf16 to avoid OOM
+            save_strategy="steps",
+            save_steps=500,           # Save every 500 steps instead of per-epoch
+            eval_strategy="steps",
+            eval_steps=500,           # Evaluate every 500 steps
+            load_best_model_at_end=True,
             metric_for_best_model=train_cfg["metric_for_best_model"],
             greater_is_better=train_cfg["greater_is_better"],
-            logging_steps=train_cfg["logging_steps"],
-            save_total_limit=train_cfg["save_total_limit"],
+            logging_steps=20,
+            save_total_limit=2,       # Keep only 2 checkpoints to save disk
             predict_with_generate=train_cfg["predict_with_generate"],
-            generation_max_length=train_cfg["generation_max_length"],
-            generation_num_beams=train_cfg["generation_num_beams"],
-            label_smoothing_factor=train_cfg.get("label_smoothing_factor", 0.1),
+            generation_max_length=128,  # Reduce from 256 to save memory during eval
+            generation_num_beams=2,     # Reduce beams for eval to save memory
+            label_smoothing_factor=train_cfg.get("label_smoothing_factor", 0.0),
             report_to=["mlflow"] if self._mlflow_run else ["none"],
+            # Memory optimization
+            dataloader_num_workers=0,   # Avoid multiprocessing overhead on Windows
+            dataloader_pin_memory=True,
+            gradient_checkpointing=True,
+            optim="adamw_torch",
+            # Save only model weights (skip optimizer state to avoid Windows zip64 bug)
+            save_safetensors=True,
+            save_only_model=True,
+            # Disable DataParallel — using device_map model parallelism instead
+            ddp_find_unused_parameters=False,
         )
 
         # BLEU metric for eval
