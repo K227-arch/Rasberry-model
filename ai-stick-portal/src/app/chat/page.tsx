@@ -189,7 +189,7 @@ export default function ChatPage() {
 
       {/* Input Bar */}
       <div className="fixed bottom-0 left-0 w-full z-50">
-        <div className="max-w-screen-xl mx-auto px-margin-mobile pb-4">
+        <div className="max-w-screen-xl mx-auto px-margin-mobile pb-20">
           <div className="bg-surface-container-lowest rounded-xl shadow-[0_-8px_24px_rgba(93,64,55,0.08)] border border-outline-variant p-3 flex items-end gap-3">
             <button className="text-on-surface-variant hover:bg-surface-container transition-all rounded-lg active:scale-90 p-3 cursor-pointer" aria-label="Add">
               <span className="material-symbols-outlined">add_circle</span>

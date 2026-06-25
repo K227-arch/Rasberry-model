@@ -1,0 +1,16 @@
+Words 23june2026 Cleaned - Summary
+========================================
+
+Source: c:\Users\MarvinCliveTwesige\Desktop\PROJECTS\Rasberry-model\raw data\sentence and word\Words 23june2026\Words 23june2026
+Output: c:\Users\MarvinCliveTwesige\Desktop\PROJECTS\Rasberry-model\raw data\words 23june2026 cleaned
+
+Total rows in source: 17122
+Completed entries: 5078
+Word pairs (cleaned): 4675
+Example sentence pairs (cleaned): 4619
+Total unique pairs: 9294
+
+Files:
+  - words_cleaned.xlsx: Word-to-English pairs
+  - word_examples_cleaned.xlsx: Example sentence pairs
+  - all_pairs_cleaned.xlsx: Everything combined

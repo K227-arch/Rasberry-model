@@ -1,0 +1,45 @@
+Words 23june2026 Cleaned - Summary
+========================================
+
+Source: c:\Users\MarvinCliveTwesige\Desktop\PROJECTS\Rasberry-model\raw data\sentence and word\Words 23june2026\Words 23june2026
+Output: c:\Users\MarvinCliveTwesige\Desktop\PROJECTS\Rasberry-model\raw data\words 23june2026 cleaned
+
+Total rows in source: 17122
+Completed entries: 5078
+Word pairs (cleaned): 4686
+Example sentence pairs (cleaned): 4621
+Total unique pairs: 9307
+
+Columns: Runyoro | English | Domain | POS
+
+Domain distribution:
+  Daily Life & Conversation: 1300
+  Environment & Nature: 978
+  Arts and entertainment: 969
+  Agriculture: 797
+  Spiritual & Religious: 681
+  Animals: 618
+  Health and Medicine: 580
+  Culture & Traditions: 525
+  Education & Learning: 512
+  History: 510
+  Culture & Tradition: 507
+  Economics & Commerce: 498
+  Daily Life and Conversations: 435
+  History & Historical Events: 203
+  Narratives and Storytelling: 180
+
+POS distribution:
+  Noun: 7919
+  noun: 508
+  Adjective: 415
+  Verb: 233
+  Adverb: 82
+  Phrase: 58
+  Noun/Verb: 28
+  interjection: 20
+  Pronoun: 16
+  adjective: 8
+
+Note: Domain and POS columns are for reference/tracking only.
+Only the Runyoro and English columns are used during model training.
