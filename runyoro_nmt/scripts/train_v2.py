@@ -112,34 +112,22 @@ logger.info("=" * 60)
 logger.info("TRAIN V2 — Full-data training with nyk_Latn BOS")
 logger.info("=" * 60)
 
-# ── Load ALL data (4,520 augmented pairs) ─────────────────────
-all_pairs = load_tsv(ROOT / "data/augmented/all_pairs.tsv")
-logger.info("Loaded %d augmented pairs from all_pairs.tsv", len(all_pairs))
-
-# Also load any back-translated pairs if available
-bt_path = ROOT / "data/augmented/back_translated.tsv"
-bt_rev_path = ROOT / "data/augmented/back_translated_reverse.tsv"
-bt_pairs = []
-if bt_path.exists():
-    bt_pairs = load_tsv(str(bt_path))
-    logger.info("Loaded %d back-translated pairs", len(bt_pairs))
-if bt_rev_path.exists():
-    bt_rev = load_tsv(str(bt_rev_path))
-    bt_pairs.extend(bt_rev)
-    logger.info("Loaded %d reverse back-translated pairs", len(bt_rev))
-
-all_pairs = all_pairs + bt_pairs
-logger.info("TOTAL training pairs (original + back-translated): %d", len(all_pairs))
+# ── Load CLEAN pairs only ─────────────────────────────────────
+# Use cleaned_pairs.tsv — these are the original validated pairs without
+# augmentation or synthetic back-translation.
+# The model will learn Runyoro purely from real human-written data.
+clean_path = ROOT / "data/processed/cleaned_pairs.tsv"
+all_pairs = load_tsv(clean_path)
+logger.info("Loaded %d clean pairs from cleaned_pairs.tsv", len(all_pairs))
 
 # ── Tokenizer ─────────────────────────────────────────────────
 logger.info("Loading tokenizer: %s", MODEL_NAME)
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, token=HF_TOKEN)
 
-# Inject nyk_Latn as a real special token (copy lug_Latn embedding)
+# Add nyk_Latn as a real special token (random init — NOT from lug_Latn)
 if tokenizer.convert_tokens_to_ids(NLLB_RNY) == tokenizer.unk_token_id:
-    lug_id = tokenizer.convert_tokens_to_ids("lug_Latn")
     tokenizer.add_tokens([NLLB_RNY], special_tokens=True)
-    logger.info("nyk_Latn will be resized after model load (id=%d)", len(tokenizer) - 1)
+    logger.info("nyk_Latn added as new token (id=%d)", len(tokenizer) - 1)
 
 # ── Build bidirectional datasets ──────────────────────────────
 logger.info("Tokenising datasets (bidirectional)...")
@@ -181,18 +169,22 @@ if torch.cuda.is_available():
     free_mem, total_mem = torch.cuda.mem_get_info()
     logger.info("  GPU memory: %.1f / %.1f GB free", free_mem / 1e9, total_mem / 1e9)
 
-# Resize for nyk_Latn token
+# Resize for nyk_Latn token — use SMALL RANDOM initialisation
+# Do NOT copy from lug_Latn or any other language — this caused Luganda output.
+# Starting from noise forces the model to learn Runyoro purely from the training pairs.
 model.resize_token_embeddings(len(tokenizer))
 nyk_id = tokenizer.convert_tokens_to_ids(NLLB_RNY)
-lug_id = tokenizer.convert_tokens_to_ids("lug_Latn")
 with torch.no_grad():
-    model.get_input_embeddings().weight[nyk_id] = (
-        model.get_input_embeddings().weight[lug_id].clone()
+    # Initialise as zero + tiny random noise (std=0.01 — much smaller than normal embeddings)
+    torch.nn.init.normal_(
+        model.get_input_embeddings().weight[nyk_id : nyk_id + 1],
+        mean=0.0, std=0.01,
     )
     model.get_output_embeddings().weight[nyk_id] = (
-        model.get_output_embeddings().weight[lug_id].clone()
+        model.get_input_embeddings().weight[nyk_id].clone()
     )
-logger.info("Copied lug_Latn embedding → nyk_Latn (id=%d)", nyk_id)
+logger.info("Initialised nyk_Latn (id=%d) with random noise — no Luganda/proxy influence",
+            nyk_id)
 
 ENG_BOS_ID = tokenizer.convert_tokens_to_ids(NLLB_ENG)
 RNY_BOS_ID = nyk_id

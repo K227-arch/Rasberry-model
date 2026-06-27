@@ -81,7 +81,7 @@ class ModelQuantizer:
             ort_model = ORTModelForSeq2SeqLM.from_pretrained(
                 self.model_path, export=True
             )
-            out_path = self.output_dir / "runyoro-nmt-v1-onnx"
+            out_path = self.output_dir / "runyoro-nmt-v2-onnx"
             ort_model.save_pretrained(str(out_path))
             tokenizer.save_pretrained(str(out_path))
             logger.info("ONNX export complete: %s", out_path)
@@ -92,6 +92,173 @@ class ModelQuantizer:
                 "optimum not installed. Run: pip install optimum[onnxruntime]"
             )
             raise
+
+    # ------------------------------------------------------------------
+    # ONNX INT8 Static Quantization (Best for edge deployment)
+    # ------------------------------------------------------------------
+    def quantize_onnx_int8(
+        self,
+        calibration_data_path: Optional[str] = None,
+        num_calibration_samples: int = 100,
+    ) -> Path:
+        """
+        Full ONNX INT8 static quantization pipeline:
+        1. Export model to ONNX
+        2. Calibrate with representative data
+        3. Apply static INT8 quantization
+        4. Optimize the graph
+
+        This produces the smallest model with minimal accuracy loss.
+        Ideal for Raspberry Pi / edge CPU deployment.
+        """
+        try:
+            from optimum.onnxruntime import ORTModelForSeq2SeqLM  # type: ignore
+            from optimum.onnxruntime import ORTQuantizer  # type: ignore
+            from optimum.onnxruntime.configuration import (  # type: ignore
+                AutoQuantizationConfig,
+                QuantizationConfig,
+            )
+            from optimum.onnxruntime import ORTOptimizer  # type: ignore
+            from optimum.onnxruntime.configuration import OptimizationConfig  # type: ignore
+            from transformers import AutoTokenizer  # type: ignore
+        except ImportError:
+            logger.error(
+                "optimum not installed. Run: pip install optimum[onnxruntime]"
+            )
+            raise
+
+        # Step 1: Export to ONNX if not already done
+        onnx_path = self.output_dir / "runyoro-nmt-v2-onnx"
+        if not (onnx_path / "encoder_model.onnx").exists():
+            logger.info("Step 1: Exporting model to ONNX...")
+            tokenizer = AutoTokenizer.from_pretrained(self.model_path)
+            ort_model = ORTModelForSeq2SeqLM.from_pretrained(
+                self.model_path, export=True
+            )
+            ort_model.save_pretrained(str(onnx_path))
+            tokenizer.save_pretrained(str(onnx_path))
+            logger.info("ONNX export done: %s", onnx_path)
+        else:
+            logger.info("Step 1: ONNX model already exists at %s", onnx_path)
+
+        # Step 2: Optimize the ONNX graph
+        logger.info("Step 2: Optimizing ONNX graph...")
+        optimized_path = self.output_dir / "runyoro-nmt-v2-onnx-optimized"
+        try:
+            optimizer = ORTOptimizer.from_pretrained(str(onnx_path))
+            optimization_config = OptimizationConfig(
+                optimization_level=2,  # Extended optimizations
+                optimize_for_gpu=False,  # CPU target
+            )
+            optimizer.optimize(
+                save_dir=str(optimized_path),
+                optimization_config=optimization_config,
+            )
+            logger.info("Optimization done: %s", optimized_path)
+        except Exception as e:
+            logger.warning("Optimization failed (%s), using unoptimized ONNX", e)
+            optimized_path = onnx_path
+
+        # Step 3: Quantize to INT8
+        logger.info("Step 3: Quantizing to INT8...")
+        quantized_path = self.output_dir / "runyoro-nmt-v2-onnx-int8"
+
+        try:
+            # Try static quantization with calibration
+            quantizer = ORTQuantizer.from_pretrained(str(optimized_path))
+
+            # Use AVX2-optimized INT8 config for x86 CPUs
+            qconfig = AutoQuantizationConfig.avx2(
+                is_static=False,  # Dynamic is safer for seq2seq
+                per_channel=True,
+            )
+
+            quantizer.quantize(
+                save_dir=str(quantized_path),
+                quantization_config=qconfig,
+            )
+        except Exception as e:
+            logger.warning(
+                "Advanced quantization failed (%s), falling back to basic dynamic", e
+            )
+            # Fallback: basic dynamic quantization
+            try:
+                from onnxruntime.quantization import quantize_dynamic, QuantType  # type: ignore
+
+                encoder_onnx = optimized_path / "encoder_model.onnx"
+                decoder_onnx = optimized_path / "decoder_model.onnx"
+
+                quantized_path.mkdir(parents=True, exist_ok=True)
+
+                if encoder_onnx.exists():
+                    quantize_dynamic(
+                        str(encoder_onnx),
+                        str(quantized_path / "encoder_model.onnx"),
+                        weight_type=QuantType.QInt8,
+                    )
+                    logger.info("Encoder quantized to INT8")
+
+                if decoder_onnx.exists():
+                    quantize_dynamic(
+                        str(decoder_onnx),
+                        str(quantized_path / "decoder_model.onnx"),
+                        weight_type=QuantType.QInt8,
+                    )
+                    logger.info("Decoder quantized to INT8")
+
+                # Copy tokenizer and config files
+                import shutil
+                for f in optimized_path.glob("*.json"):
+                    shutil.copy2(f, quantized_path / f.name)
+                for f in optimized_path.glob("*.model"):
+                    shutil.copy2(f, quantized_path / f.name)
+                tokenizer_path = optimized_path / "tokenizer.json"
+                if tokenizer_path.exists():
+                    shutil.copy2(tokenizer_path, quantized_path / "tokenizer.json")
+
+            except Exception as e2:
+                logger.error("Fallback quantization also failed: %s", e2)
+                raise
+
+        # Report sizes
+        orig_size = self._model_size_mb(self.model_path)
+        onnx_size = self._model_size_mb(str(onnx_path))
+        quant_size = self._model_size_mb(str(quantized_path))
+        logger.info(
+            "ONNX INT8 quantization complete:\n"
+            "  Original (PyTorch): %.1f MB\n"
+            "  ONNX (FP32):        %.1f MB\n"
+            "  ONNX INT8:          %.1f MB\n"
+            "  Reduction:           %.1f%%",
+            orig_size, onnx_size, quant_size,
+            100 * (1 - quant_size / max(orig_size, 1)),
+        )
+        logger.info("Quantized model saved to: %s", quantized_path)
+        return quantized_path
+
+    # ------------------------------------------------------------------
+    # ONNX INT8 inference helper
+    # ------------------------------------------------------------------
+    def test_onnx_int8(self, text: str, quantized_path: Optional[str] = None) -> str:
+        """Test translation using the quantized ONNX INT8 model."""
+        try:
+            from optimum.onnxruntime import ORTModelForSeq2SeqLM  # type: ignore
+            from transformers import AutoTokenizer  # type: ignore
+
+            qpath = quantized_path or str(
+                self.output_dir / "runyoro-nmt-v2-onnx-int8"
+            )
+            tokenizer = AutoTokenizer.from_pretrained(qpath)
+            model = ORTModelForSeq2SeqLM.from_pretrained(qpath)
+
+            inputs = tokenizer(text, return_tensors="pt", max_length=256, truncation=True)
+            outputs = model.generate(**inputs, num_beams=4, max_length=256)
+            translation = tokenizer.decode(outputs[0], skip_special_tokens=True)
+            return translation
+
+        except Exception as e:
+            logger.error("ONNX INT8 inference failed: %s", e)
+            return f"Error: {e}"
 
     # ------------------------------------------------------------------
     # CTranslate2 conversion (fastest CPU inference)

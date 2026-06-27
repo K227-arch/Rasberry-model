@@ -77,7 +77,11 @@ class NMTEvaluator:
         import torch
 
         self._tokenizer.src_lang = src_lang
-        forced_bos_id = self._tokenizer.lang_code_to_id[tgt_lang]
+        # Handle different NLLB tokenizer versions
+        if hasattr(self._tokenizer, 'lang_code_to_id'):
+            forced_bos_id = self._tokenizer.lang_code_to_id[tgt_lang]
+        else:
+            forced_bos_id = self._tokenizer.convert_tokens_to_ids(tgt_lang)
 
         results = []
         batch_size = 8
