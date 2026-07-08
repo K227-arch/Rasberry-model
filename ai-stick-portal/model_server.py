@@ -1,8 +1,9 @@
 """
-AI Stick — NLLB Model Server (runyoro-nmt-v3)
+AI Stick — NLLB Model Server (runyoro-nmt-v4)
 ==============================================
 FastAPI server using the fine-tuned NLLB-200 model.
 No language codes — model learns direction from text patterns.
+v4: trained on 679 pairs (99 original + 133 new tense variations + augmented), 20 epochs.
 """
 import os
 import re
@@ -21,14 +22,14 @@ logger = logging.getLogger("model_server")
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CHECKPOINT_DIR = os.path.join(
-    BASE_DIR, "..", "runyoro_nmt", "models", "checkpoints", "runyoro-nmt-v3"
+    BASE_DIR, "..", "runyoro_nmt", "models", "checkpoints", "runyoro-nmt-v4"
 )
-# Fallback to HuggingFace if local doesn't exist
+# Fallback chain: v4 -> v3 -> HuggingFace
 if not os.path.isdir(CHECKPOINT_DIR):
     CHECKPOINT_DIR = os.path.join(
-        BASE_DIR, "..", "runyoro_nmt", "models", "checkpoints", "runyoro-nmt-v2"
+        BASE_DIR, "..", "runyoro_nmt", "models", "checkpoints", "runyoro-nmt-v3"
     )
-MODEL_PATH = CHECKPOINT_DIR if os.path.isdir(CHECKPOINT_DIR) else "kathay/runyoro-nmt-v3"
+MODEL_PATH = CHECKPOINT_DIR if os.path.isdir(CHECKPOINT_DIR) else "kathay/runyoro-nmt-v4"
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -94,7 +95,7 @@ class TranslateResponse(BaseModel):
 async def root():
     return {
         "name": "AI Stick — NLLB Model Server",
-        "model": "runyoro-nmt-v3 (NLLB-200 distilled, FP32, no lang codes)",
+        "model": "runyoro-nmt-v4 (NLLB-200 distilled, FP32, no lang codes)",
         "device": device,
         "loaded": model is not None,
         "endpoints": {
@@ -110,7 +111,7 @@ async def health():
         "status": "ok",
         "device": device,
         "model_loaded": model is not None,
-        "model": "runyoro-nmt-v3",
+        "model": "runyoro-nmt-v4",
     }
 
 
