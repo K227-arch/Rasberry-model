@@ -4,11 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const NAV_ITEMS = [
-  { label: "Home",       icon: "home",       href: "/",           fillIcon: "home"       },
-  { label: "Translate",  icon: "g_translate", href: "/translate",  fillIcon: "g_translate"},
-  { label: "Chat",       icon: "chat_bubble", href: "/chat",       fillIcon: "chat_bubble"},
-  { label: "Dictionary", icon: "menu_book",   href: "/dictionary", fillIcon: "menu_book"  },
-  { label: "History",    icon: "history",     href: "/history",    fillIcon: "history"    },
+  { label: "Home",       icon: "home",         href: "/",           fillIcon: "home"         },
+  { label: "Translate",  icon: "g_translate",   href: "/translate",  fillIcon: "g_translate"  },
+  { label: "Lens",       icon: "photo_camera",  href: "/lens",       fillIcon: "photo_camera" },
+  { label: "Chat",       icon: "chat_bubble",   href: "/chat",       fillIcon: "chat_bubble"  },
+  { label: "Dictionary", icon: "menu_book",     href: "/dictionary", fillIcon: "menu_book"    },
 ] as const;
 
 export default function BottomNavBar() {

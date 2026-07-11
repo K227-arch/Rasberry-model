@@ -4,13 +4,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const NAV_ITEMS = [
-  { label: "Home",        icon: "home",        href: "/"           },
-  { label: "Translate",   icon: "g_translate",  href: "/translate"  },
-  { label: "Chat",        icon: "chat_bubble",  href: "/chat"       },
-  { label: "Editor",      icon: "edit_note",    href: "/editor"     },
-  { label: "Dictionary",  icon: "menu_book",    href: "/dictionary" },
-  { label: "History",     icon: "history",      href: "/history"    },
-  { label: "Settings",    icon: "settings",     href: "/settings"   },
+  { label: "Home",        icon: "home",         href: "/"           },
+  { label: "Translate",   icon: "g_translate",   href: "/translate"  },
+  { label: "Lens",        icon: "photo_camera",  href: "/lens"       },
+  { label: "Chat",        icon: "chat_bubble",   href: "/chat"       },
+  { label: "Editor",      icon: "edit_note",     href: "/editor"     },
+  { label: "Dictionary",  icon: "menu_book",     href: "/dictionary" },
+  { label: "History",     icon: "history",       href: "/history"    },
+  { label: "Settings",    icon: "settings",      href: "/settings"   },
 ] as const;
 
 export default function Sidebar() {

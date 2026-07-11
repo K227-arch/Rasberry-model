@@ -264,9 +264,10 @@ export default function TranslatePage() {
           {/* Linguistic tools row */}
           <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[
-              { icon: "menu_book",   title: "Dictionary",      desc: "Browse Runyoro-English word pairs",  href: "/dictionary" },
-              { icon: "history",     title: "History",         desc: "View past translations",             href: "/history"    },
-              { icon: "chat_bubble", title: "AI Chat",         desc: "Conversational translation help",    href: "/chat"       },
+              { icon: "photo_camera", title: "Camera Lens",    desc: "Point & translate with your camera", href: "/lens"       },
+              { icon: "menu_book",    title: "Dictionary",     desc: "Browse Runyoro-English word pairs",  href: "/dictionary" },
+              { icon: "history",      title: "History",        desc: "View past translations",             href: "/history"    },
+              { icon: "chat_bubble",  title: "AI Chat",        desc: "Conversational translation help",    href: "/chat"       },
             ].map((t) => (
               <a key={t.href} href={t.href}
                 className="glass-card rounded-2xl p-4 border border-outline-variant hover:bg-surface-container transition-colors cursor-pointer group flex items-center gap-3">
