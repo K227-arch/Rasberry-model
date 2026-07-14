@@ -1,9 +1,9 @@
 """
-AI Stick — NLLB Model Server (runyoro-nmt-v5)
+AI Stick — NLLB Model Server (runyoro-nmt-v6)
 ==============================================
 FastAPI server using the fine-tuned NLLB-200 model.
 No language codes — model learns direction from text patterns.
-v5: trained on 1798 pairs (366 clean + augmented + back-translation), 20 epochs.
+v6: trained on 499 clean pairs (+ augmentation), 20 epochs, bidirectional.
 
 Camera Lens OCR: EasyOCR + OpenCV for text detection, NLLB for translation.
 """
@@ -29,18 +29,18 @@ logger = logging.getLogger("model_server")
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CHECKPOINT_DIR = os.path.join(
-    BASE_DIR, "..", "runyoro_nmt", "models", "checkpoints", "runyoro-nmt-v5"
+    BASE_DIR, "..", "runyoro_nmt", "models", "checkpoints", "runyoro-nmt-v6"
 )
-# Fallback chain: v5 -> v4 -> v3 -> HuggingFace
+# Fallback chain: v6 -> v5 -> v4 -> HuggingFace
+if not os.path.isdir(CHECKPOINT_DIR):
+    CHECKPOINT_DIR = os.path.join(
+        BASE_DIR, "..", "runyoro_nmt", "models", "checkpoints", "runyoro-nmt-v5"
+    )
 if not os.path.isdir(CHECKPOINT_DIR):
     CHECKPOINT_DIR = os.path.join(
         BASE_DIR, "..", "runyoro_nmt", "models", "checkpoints", "runyoro-nmt-v4"
     )
-if not os.path.isdir(CHECKPOINT_DIR):
-    CHECKPOINT_DIR = os.path.join(
-        BASE_DIR, "..", "runyoro_nmt", "models", "checkpoints", "runyoro-nmt-v3"
-    )
-MODEL_PATH = CHECKPOINT_DIR if os.path.isdir(CHECKPOINT_DIR) else "kathay/runyoro-nmt-v4"
+MODEL_PATH = CHECKPOINT_DIR if os.path.isdir(CHECKPOINT_DIR) else "kathay/runyoro-nmt-v5"
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -249,7 +249,7 @@ def translate_text_sync(text: str, direction: str) -> str:
     raw = tokenizer.decode(out[0], skip_special_tokens=True)
     return clean_translation(raw, tgt_bos)
 
-
+====
 @app.post("/ocr", response_model=OCRResponse)
 async def ocr_translate(req: OCRRequest):
     """
