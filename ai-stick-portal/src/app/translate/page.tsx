@@ -167,10 +167,10 @@ export default function TranslatePage() {
               <div className="mt-3 flex justify-between items-center border-t border-outline-variant/50 pt-3">
                 <span className="text-outline text-label-sm">{sourceText.length} / 5000</span>
                 <div className="flex gap-2">
-                  <button className="text-outline hover:text-primary transition-colors cursor-pointer" aria-label="Voice input">
+                  <button className="text-outline/40 cursor-not-allowed" aria-label="Voice input (coming soon)" title="Voice input coming soon" disabled>
                     <span className="material-symbols-outlined text-[20px]">mic</span>
                   </button>
-                  <button className="text-outline hover:text-primary transition-colors cursor-pointer" aria-label="Listen">
+                  <button className="text-outline/40 cursor-not-allowed" aria-label="Listen (coming soon)" title="Text-to-speech coming soon" disabled>
                     <span className="material-symbols-outlined text-[20px]">volume_up</span>
                   </button>
                 </div>
@@ -229,7 +229,7 @@ export default function TranslatePage() {
                   <button className="text-outline hover:text-primary transition-colors cursor-pointer" aria-label="Share">
                     <span className="material-symbols-outlined text-[20px]">share</span>
                   </button>
-                  <button className="text-outline hover:text-primary transition-colors cursor-pointer" aria-label="Listen">
+                  <button className="text-outline/40 cursor-not-allowed" aria-label="Listen (coming soon)" title="Text-to-speech coming soon" disabled>
                     <span className="material-symbols-outlined text-[20px]">volume_up</span>
                   </button>
                 </div>

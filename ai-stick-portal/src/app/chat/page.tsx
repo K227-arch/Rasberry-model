@@ -161,7 +161,7 @@ export default function ChatPage() {
                       <>
                         <p className="text-on-surface whitespace-pre-line">{msg.content}</p>
                         <div className="flex items-center gap-2 mt-1">
-                          <button className="material-symbols-outlined text-secondary text-[20px] hover:bg-surface-container transition-all p-1 rounded-full cursor-pointer">
+                          <button className="material-symbols-outlined text-on-surface-variant/40 text-[20px] p-1 rounded-full cursor-not-allowed" title="Audio coming soon" disabled>
                             volume_up
                           </button>
                           <button
@@ -210,7 +210,7 @@ export default function ChatPage() {
               />
             </div>
             <div className="flex gap-1">
-              <button className="p-3 bg-secondary-container text-on-secondary-container rounded-lg hover:bg-secondary-fixed transition-all active:scale-90 cursor-pointer" aria-label="Voice">
+              <button className="p-3 bg-surface-container text-on-surface-variant/40 rounded-lg cursor-not-allowed" aria-label="Voice (coming soon)" title="Voice input coming soon" disabled>
                 <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>
                   mic
                 </span>

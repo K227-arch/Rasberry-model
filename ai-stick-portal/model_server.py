@@ -1,9 +1,9 @@
 """
-AI Stick — NLLB Model Server (runyoro-nmt-v4)
+AI Stick — NLLB Model Server (runyoro-nmt-v5)
 ==============================================
 FastAPI server using the fine-tuned NLLB-200 model.
 No language codes — model learns direction from text patterns.
-v4: trained on 679 pairs (99 original + 133 new tense variations + augmented), 20 epochs.
+v5: trained on 1798 pairs (366 clean + augmented + back-translation), 20 epochs.
 
 Camera Lens OCR: EasyOCR + OpenCV for text detection, NLLB for translation.
 """
@@ -29,9 +29,13 @@ logger = logging.getLogger("model_server")
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CHECKPOINT_DIR = os.path.join(
-    BASE_DIR, "..", "runyoro_nmt", "models", "checkpoints", "runyoro-nmt-v4"
+    BASE_DIR, "..", "runyoro_nmt", "models", "checkpoints", "runyoro-nmt-v5"
 )
-# Fallback chain: v4 -> v3 -> HuggingFace
+# Fallback chain: v5 -> v4 -> v3 -> HuggingFace
+if not os.path.isdir(CHECKPOINT_DIR):
+    CHECKPOINT_DIR = os.path.join(
+        BASE_DIR, "..", "runyoro_nmt", "models", "checkpoints", "runyoro-nmt-v4"
+    )
 if not os.path.isdir(CHECKPOINT_DIR):
     CHECKPOINT_DIR = os.path.join(
         BASE_DIR, "..", "runyoro_nmt", "models", "checkpoints", "runyoro-nmt-v3"
@@ -110,7 +114,7 @@ class TranslateResponse(BaseModel):
 async def root():
     return {
         "name": "AI Stick — NLLB Model Server",
-        "model": "runyoro-nmt-v4 (NLLB-200 distilled, FP32, no lang codes)",
+        "model": "runyoro-nmt-v5 (NLLB-200 distilled, FP32, no lang codes)",
         "device": device,
         "loaded": model is not None,
         "ocr_loaded": ocr_reader is not None,
@@ -128,7 +132,7 @@ async def health():
         "status": "ok",
         "device": device,
         "model_loaded": model is not None,
-        "model": "runyoro-nmt-v4",
+        "model": "runyoro-nmt-v5",
     }
 
 
