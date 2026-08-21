@@ -212,7 +212,7 @@ export default function LensPage() {
   return (
     <>
       <TopAppBar />
-      <main className="mt-16 md:mt-0 flex-1 flex flex-col w-full px-margin-mobile pt-4 pb-36 md:pb-8 max-w-5xl md:mx-auto">
+      <main className="mt-16 md:mt-0 flex-1 flex flex-col w-full px-margin-mobile md:px-8 lg:px-12 pt-4 pb-36 md:pb-8 max-w-5xl md:mx-auto">
         {/* Header */}
         <div className="flex items-center gap-3 mb-4">
           <span className="material-symbols-outlined text-primary text-[28px]">

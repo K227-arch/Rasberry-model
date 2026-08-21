@@ -47,7 +47,7 @@ export default function DictionaryPage() {
   return (
     <>
       <TopAppBar />
-      <main className="mt-16 md:mt-0 flex-1 flex flex-col w-full px-margin-mobile pt-6 pb-36 md:pb-8 max-w-4xl md:mx-auto">
+      <main className="mt-16 md:mt-0 flex-1 flex flex-col w-full px-margin-mobile md:px-8 lg:px-12 pt-6 pb-36 md:pb-8 max-w-4xl md:mx-auto">
 
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">
@@ -113,10 +113,10 @@ export default function DictionaryPage() {
             {filtered.map((entry, i) => (
               <div
                 key={i}
-                className="glass-card rounded-2xl p-4 premium-shadow flex items-start gap-4 hover:border-primary transition-colors group"
+                className="glass-card rounded-2xl p-4 premium-shadow flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-4 hover:border-primary transition-colors group"
               >
                 {/* Runyoro side */}
-                <div className="flex-1 min-w-0">
+                <div className="min-w-0 sm:flex-1">
                   <p className="text-body-lg text-on-background font-semibold leading-tight truncate">
                     {entry.runyoro}
                   </p>
@@ -126,10 +126,11 @@ export default function DictionaryPage() {
                 </div>
 
                 {/* Divider */}
-                <div className="w-px self-stretch bg-outline-variant/50 flex-shrink-0" />
+                <div className="hidden sm:block w-px self-stretch bg-outline-variant/50 flex-shrink-0" />
+                <div className="sm:hidden h-px w-full bg-outline-variant/50 flex-shrink-0" />
 
                 {/* English side */}
-                <div className="flex-1 min-w-0">
+                <div className="min-w-0 sm:flex-1">
                   <p className="text-body-md text-on-surface leading-snug">
                     {entry.english}
                   </p>
@@ -141,7 +142,7 @@ export default function DictionaryPage() {
                 </div>
 
                 {/* Domain badge */}
-                <span className={`text-label-sm px-2 py-0.5 rounded-full flex-shrink-0 ${DOMAIN_COLORS[entry.domain || "general"] || DOMAIN_COLORS.general}`}>
+                <span className={`text-label-sm px-2 py-0.5 rounded-full flex-shrink-0 self-start ${DOMAIN_COLORS[entry.domain || "general"] || DOMAIN_COLORS.general}`}>
                   {entry.domain || "general"}
                 </span>
               </div>

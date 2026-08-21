@@ -97,9 +97,9 @@ export default function ChatPage() {
       <div className="w-full h-1 bg-surface-container overflow-hidden">
         <div className="h-full bg-primary-container w-1/3 animate-pulse" />
       </div>
-      <main className="flex-1 flex flex-col max-w-screen-xl mx-auto w-full px-margin-mobile py-6 gap-6 pb-36">
+      <main className="mt-16 md:mt-0 flex-1 flex flex-col max-w-screen-xl mx-auto w-full px-margin-mobile md:px-8 lg:px-12 py-6 gap-6 pb-44 md:pb-24">
         {/* Language Toggle */}
-        <div className="flex justify-center gap-3 sticky top-20 z-40">
+        <div className="flex justify-center gap-3 sticky top-20 md:top-4 z-40">
           <div className="glass-card p-1 rounded-full flex gap-1 premium-shadow">
             {LANGUAGES.map((lang) => (
               <button
@@ -188,8 +188,8 @@ export default function ChatPage() {
       </main>
 
       {/* Input Bar */}
-      <div className="fixed bottom-0 left-0 w-full z-50">
-        <div className="max-w-screen-xl mx-auto px-margin-mobile pb-20">
+      <div className="fixed bottom-16 md:bottom-0 left-0 w-full z-40 md:ml-64 md:w-[calc(100%-16rem)]">
+        <div className="max-w-screen-xl mx-auto px-margin-mobile md:px-8 lg:px-12 pb-4">
           <div className="bg-surface-container-lowest rounded-xl shadow-[0_-8px_24px_rgba(93,64,55,0.08)] border border-outline-variant p-3 flex items-end gap-3">
             <button className="text-on-surface-variant hover:bg-surface-container transition-all rounded-lg active:scale-90 p-3 cursor-pointer" aria-label="Add">
               <span className="material-symbols-outlined">add_circle</span>
@@ -225,8 +225,8 @@ export default function ChatPage() {
             </div>
           </div>
         </div>
-        <BottomNavBar />
       </div>
+      <BottomNavBar />
     </>
   );
 }

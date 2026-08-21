@@ -26,7 +26,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="bg-background text-on-background min-h-screen font-sans antialiased flex">
+      <body className="bg-background text-on-background min-h-screen font-sans antialiased flex overflow-x-hidden">
         {/* Desktop sidebar */}
         <Sidebar />
         {/* Main content shifts right on md+ */}

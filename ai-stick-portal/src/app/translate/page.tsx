@@ -102,7 +102,7 @@ export default function TranslatePage() {
   return (
     <>
       <TopAppBar />
-      <main className="mt-16 md:mt-0 flex-1 flex flex-col w-full px-margin-mobile pt-6 pb-36 md:pb-8 max-w-5xl md:mx-auto">
+      <main className="mt-16 md:mt-0 flex-1 flex flex-col w-full px-margin-mobile md:px-8 lg:px-12 pt-6 pb-36 md:pb-8 max-w-5xl md:mx-auto">
 
         {/* Page title — desktop */}
         <div className="hidden md:flex items-center gap-3 mb-6">
@@ -262,7 +262,7 @@ export default function TranslatePage() {
           </section>
 
           {/* Linguistic tools row */}
-          <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
               { icon: "photo_camera", title: "Camera Lens",    desc: "Point & translate with your camera", href: "/lens"       },
               { icon: "menu_book",    title: "Dictionary",     desc: "Browse Runyoro-English word pairs",  href: "/dictionary" },
