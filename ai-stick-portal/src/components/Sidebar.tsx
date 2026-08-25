@@ -21,8 +21,7 @@ export default function Sidebar() {
     <aside className="hidden md:flex flex-col w-64 bg-surface-container-lowest border-r border-outline-variant/30 fixed top-0 left-0 h-full z-50 premium-shadow">
       {/* Logo */}
       <div className="flex items-center gap-3 px-6 h-16 border-b border-outline-variant/30">
-        <span className="material-symbols-outlined text-primary text-[32px]">stylus</span>
-        <div>
+        <img src="/logo.png" alt="AI Stick Logo" className="h-10 w-auto" />        <div>
           <h1 className="text-display-lg text-primary leading-tight">AI Stick</h1>
           <p className="text-label-sm text-on-surface-variant -mt-0.5">Offline Intelligence</p>
         </div>

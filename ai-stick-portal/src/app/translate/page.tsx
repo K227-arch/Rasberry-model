@@ -40,8 +40,8 @@ function saveToHistory(src: Lang, tgt: Lang, source: string, translation: string
 }
 
 export default function TranslatePage() {
-  const [sourceLang, setSourceLang] = useState<Lang>("Runyoro-Rutooro");
-  const [targetLang, setTargetLang] = useState<Lang>("English");
+  const [sourceLang, setSourceLang] = useState<Lang>("English");
+  const [targetLang, setTargetLang] = useState<Lang>("Runyoro-Rutooro");
   const [sourceText, setSourceText] = useState("");
   const [translation, setTranslation] = useState("");
   const [loading, setLoading] = useState(false);

@@ -1,12 +1,17 @@
 """
-AI Stick — NLLB Model Server (runyoro-nmt-v6)
-==============================================
-FastAPI server using the fine-tuned NLLB-200 model.
-No language codes — model learns direction from text patterns.
-v6: trained on 499 clean pairs (+ augmentation), 20 epochs, bidirectional.
+AI Stick — NLLB Model Server (runyoro-rut-v1)
+=============================================
+Uses a custom rut_Latn token added to the NLLB tokenizer.
+At generation time we set forced_bos_token_id so the decoder
+is physically constrained to start in the correct language —
+the model cannot fall back to nyk_Latn, English, or anything else.
 
-Camera Lens OCR: EasyOCR + OpenCV for text detection, NLLB for translation.
+  EN → Runyoro : forced_bos_token_id = rut_token_id
+  Runyoro → EN : forced_bos_token_id = eng_token_id
+
+Always float32 — bfloat16 causes multilingual leakage.
 """
+import json
 import os
 import re
 import base64
@@ -28,77 +33,214 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("model_server")
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-CHECKPOINT_DIR = os.path.join(
-    BASE_DIR, "..", "runyoro_nmt", "models", "checkpoints", "runyoro-nmt-v6"
-)
-# Fallback chain: v6 -> v5 -> v4 -> HuggingFace
-if not os.path.isdir(CHECKPOINT_DIR):
-    CHECKPOINT_DIR = os.path.join(
-        BASE_DIR, "..", "runyoro_nmt", "models", "checkpoints", "runyoro-nmt-v5"
-    )
-if not os.path.isdir(CHECKPOINT_DIR):
-    CHECKPOINT_DIR = os.path.join(
-        BASE_DIR, "..", "runyoro_nmt", "models", "checkpoints", "runyoro-nmt-v4"
-    )
-MODEL_PATH = CHECKPOINT_DIR if os.path.isdir(CHECKPOINT_DIR) else "kathay/runyoro-nmt-v5"
 
+# ── Model path: prefer latest rut model, fall back to clean-v4 ───────────────
+_CKPT = os.path.join(BASE_DIR, "..", "runyoro_nmt", "models", "checkpoints")
+_RUT_V4   = os.path.join(_CKPT, "runyoro-rut-v4")
+_RUT_V3   = os.path.join(_CKPT, "runyoro-rut-v3")
+_RUT_V2   = os.path.join(_CKPT, "runyoro-rut-v2")
+_RUT_V1   = os.path.join(_CKPT, "runyoro-rut-v1")
+_CLEAN_V4 = os.path.join(_CKPT, "runyoro-clean-v4")
+
+if os.path.isdir(_RUT_V4):
+    MODEL_PATH = _RUT_V4
+elif os.path.isdir(_RUT_V3):
+    MODEL_PATH = _RUT_V3
+elif os.path.isdir(_RUT_V2):
+    MODEL_PATH = _RUT_V2
+elif os.path.isdir(_RUT_V1):
+    MODEL_PATH = _RUT_V1
+else:
+    MODEL_PATH = _CLEAN_V4
+
+TORCH_DTYPE = torch.float32   # Never bf16 — causes multilingual leakage
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 tokenizer = None
 model = None
-
-NLLB_RNY = "nyk_Latn"
-NLLB_ENG = "eng_Latn"
-NLLB_RNY_BOS = "nyk_Latn"
-NLLB_ENG_BOS = "eng_Latn"
+RUT_TOKEN_ID: Optional[int] = None   # forced BOS for Runyoro output
+ENG_TOKEN_ID: Optional[int] = None   # forced BOS for English output
+USING_RUT_PREFIX: bool = False        # True when rut-v1 model is loaded
 
 POS_TAG_RE = re.compile(r"\[[A-Z_]+\]\s*")
-
-# EasyOCR reader (loaded at startup)
 ocr_reader: Optional[easyocr.Reader] = None
+
+# ── Phrase dictionary — always-correct fast-path ──────────────────────────────
+PHRASE_DICT_EN_TO_RNY: dict[str, str] = {
+    "good morning": "oraire ota",
+    "good evening": "osibye ota",
+    "good night": "oire ota",
+    "how are you": "muli kurungi",
+    "i am fine": "ndi kurungi",
+    "i am fine thank you": "ndi kurungi webale",
+    "thank you": "webale",
+    "thank you very much": "webale nyo",
+    "you are welcome": "kaikuru",
+    "yes": "yego",
+    "no": "nedda",
+    "please": "bakwana",
+    "sorry": "mbabarira",
+    "i love you": "nkukunda",
+    "what is your name": "eizina ryawe ni irihe",
+    "my name is": "eizina ryange ni",
+    "where are you going": "oli hahi",
+    "come here": "iza hano",
+    "sit down": "tuura wansi",
+    "stand up": "simama",
+    "i don't understand": "sisobola kuhangana",
+    "i understand": "nsobola kuhangana",
+    "speak slowly": "yogera mpola mpola",
+    "what time is it": "esaawa ni ngahi",
+    "goodbye": "gire munonga",
+    "see you later": "turabonana",
+    "help me": "nkwasire",
+    "water": "amazi",
+    "food": "ebyokulya",
+    "i am hungry": "nsiima orara",
+    "i am thirsty": "nsiima enywa",
+    "where is the hospital": "eki'sitera kiri hahi",
+    "i am sick": "ndi murwaire",
+    "call the police": "ita amapolisi",
+    "hello": "osiibwe",
+    "i am happy": "ndi omusanyufu",
+    "i don't know": "siizi",
+    "come back": "garuka",
+    "i am tired": "ndi munangifu",
+    "give me water": "mpa amaizi",
+    "i am going to school": "nyija okugenda isomero",
+    "open the door": "gunjura omulyango",
+    "please help me": "nkusaba omponye",
+    "we are friends": "turi bagenzi",
+    "how much": "esente zingahi",
+    "where do you live": "oya hahi",
+    "i live here": "ntura hano",
+}
+
+PHRASE_DICT_RNY_TO_EN: dict[str, str] = {v: k for k, v in PHRASE_DICT_EN_TO_RNY.items()}
+
+
+def phrase_lookup(text: str, is_rny_to_en: bool) -> Optional[str]:
+    key = text.lower().strip().rstrip(".,!?;:")
+    lookup = PHRASE_DICT_RNY_TO_EN if is_rny_to_en else PHRASE_DICT_EN_TO_RNY
+    return lookup.get(key)
+
+
+# ── Load token IDs ────────────────────────────────────────────────────────────
+
+def load_token_ids(tok, model_path: str) -> tuple[int, int, bool]:
+    """
+    Read rut_Latn / eng_Latn token IDs.
+    If rut_token_meta.json exists (rut-v1 model), read from there.
+    Otherwise fall back to eng_Latn id for both (clean-v4 mode).
+    Returns (rut_id, eng_id, using_rut_prefix).
+    """
+    meta_file = os.path.join(model_path, "rut_token_meta.json")
+    if os.path.isfile(meta_file):
+        with open(meta_file) as f:
+            meta = json.load(f)
+        rut_id = meta["rut_token_id"]
+        eng_id = meta["eng_token_id"]
+        logger.info("Loaded token IDs from rut_token_meta.json: rut=%d eng=%d", rut_id, eng_id)
+        return rut_id, eng_id, True
+
+    # Fallback: rut-v1 not trained yet, use clean-v4 without forced BOS
+    eng_id = tok.convert_tokens_to_ids("eng_Latn")
+    logger.warning(
+        "rut_token_meta.json not found — running WITHOUT forced_bos_token_id. "
+        "Translations may be in wrong language for ambiguous inputs. "
+        "Run train_rut_prefix.py to fix this permanently."
+    )
+    return None, eng_id, False
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    global tokenizer, model, ocr_reader
-    logger.info("Loading NLLB model from: %s on %s", MODEL_PATH, device)
+    global tokenizer, model, RUT_TOKEN_ID, ENG_TOKEN_ID, USING_RUT_PREFIX, ocr_reader
+
+    logger.info("Loading model from: %s  device=%s  dtype=float32", MODEL_PATH, device)
     tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
     model = AutoModelForSeq2SeqLM.from_pretrained(
-        MODEL_PATH,
-        torch_dtype=torch.bfloat16 if device == "cuda" else torch.float32,
+        MODEL_PATH, torch_dtype=TORCH_DTYPE
     ).to(device)
     model.eval()
 
-    rny_id = tokenizer.convert_tokens_to_ids(NLLB_RNY)
-    eng_id = tokenizer.convert_tokens_to_ids(NLLB_ENG_BOS)
-    logger.info("Token IDs — nyk_Latn=%d  eng_Latn=%d", rny_id, eng_id)
-    logger.info("NLLB model ready — %s", MODEL_PATH)
+    RUT_TOKEN_ID, ENG_TOKEN_ID, USING_RUT_PREFIX = load_token_ids(tokenizer, MODEL_PATH)
 
-    # Initialize EasyOCR reader (English; works for Runyoro latin script too)
-    logger.info("Loading EasyOCR reader...")
+    if USING_RUT_PREFIX:
+        logger.info(
+            "rut_Latn prefix active — forced_bos_token_id will lock decoder language. "
+            "EN→RUT bos=%d  RUT→EN bos=%d", RUT_TOKEN_ID, ENG_TOKEN_ID
+        )
+    else:
+        logger.info("Running in clean-v4 mode (no forced BOS). Phrase dict active for common phrases.")
+
+    logger.info("Loading EasyOCR...")
     ocr_reader = easyocr.Reader(["en"], gpu=torch.cuda.is_available())
-    logger.info("EasyOCR ready")
+    logger.info("Ready.")
     yield
 
 
 app = FastAPI(title="AI Stick — NLLB Model Server", lifespan=lifespan)
-
 app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
+    CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"]
 )
 
 
-def clean_translation(text: str, tgt_bos: str) -> str:
+# ── Helpers ───────────────────────────────────────────────────────────────────
+
+def clean_translation(text: str, capitalize: bool = False) -> str:
     text = text.strip()
+    text = re.sub(r"^>>rny<<\s*", "", text).strip()
+    text = re.sub(r"^>>eng<<\s*", "", text).strip()
+    text = re.sub(r"^rut_Latn\s*", "", text).strip()
+    text = re.sub(r"^eng_Latn\s*", "", text).strip()
     text = POS_TAG_RE.sub("", text).strip()
-    text = re.sub(r"^-\s*", "", text).strip()
-    if tgt_bos == NLLB_ENG_BOS and text and text[0].islower():
+    text = re.sub(r"^[-–—]\s*", "", text).strip()
+    text = text.split("\n")[0].strip()
+    text = re.split(r"\s[-–—]\s", text)[0].strip()
+    sentences = re.split(r"(?<=[.!?])\s+(?=[A-Z])", text)
+    if len(sentences) > 1:
+        text = sentences[0].strip()
+    if capitalize and text and text[0].islower():
         text = text[0].upper() + text[1:]
     return text
 
+
+def is_echo(source: str, output: str) -> bool:
+    """True only when output is exactly the same text as input."""
+    return (
+        source.lower().strip().rstrip(".,!?;:")
+        == output.lower().strip().rstrip(".,!?;:")
+    )
+
+
+def run_model(enc: dict, bos_id: Optional[int], capitalize: bool) -> str:
+    """
+    Run beam search. If bos_id is set, the decoder is forced to emit it
+    as the very first token — locking the output language.
+    """
+    input_len = enc["input_ids"].shape[1]
+    max_out_len = min(256, max(input_len * 3, 20))
+
+    generate_kwargs = dict(
+        **enc,
+        num_beams=5,
+        max_length=max_out_len,
+        length_penalty=1.0,
+        repetition_penalty=1.3,
+        no_repeat_ngram_size=3,
+    )
+    if bos_id is not None:
+        generate_kwargs["forced_bos_token_id"] = bos_id
+
+    with torch.no_grad():
+        out = model.generate(**generate_kwargs)
+
+    raw = tokenizer.decode(out[0], skip_special_tokens=True)
+    return clean_translation(raw, capitalize=capitalize)
+
+
+# ── Routes ────────────────────────────────────────────────────────────────────
 
 class TranslateRequest(BaseModel):
     text: str
@@ -113,27 +255,18 @@ class TranslateResponse(BaseModel):
 @app.get("/")
 async def root():
     return {
-        "name": "AI Stick — NLLB Model Server",
-        "model": "runyoro-nmt-v5 (NLLB-200 distilled, FP32, no lang codes)",
+        "model": os.path.basename(MODEL_PATH),
         "device": device,
+        "rut_prefix_active": USING_RUT_PREFIX,
+        "rut_token_id": RUT_TOKEN_ID,
+        "eng_token_id": ENG_TOKEN_ID,
         "loaded": model is not None,
-        "ocr_loaded": ocr_reader is not None,
-        "endpoints": {
-            "GET /health": "Server health check",
-            "POST /translate": "Translate text",
-            "POST /ocr": "OCR + translate from camera frame (base64 image)",
-        },
     }
 
 
 @app.get("/health")
 async def health():
-    return {
-        "status": "ok",
-        "device": device,
-        "model_loaded": model is not None,
-        "model": "runyoro-nmt-v5",
-    }
+    return {"status": "ok", "model": os.path.basename(MODEL_PATH), "device": device}
 
 
 @app.post("/translate", response_model=TranslateResponse)
@@ -149,49 +282,60 @@ async def translate(req: TranslateRequest):
         or direction.index("Runyoro") < direction.index("English")
     )
 
-    if is_rny_to_en:
-        src_lang = NLLB_RNY
-        tgt_bos = NLLB_ENG_BOS
-    else:
-        src_lang = NLLB_ENG
-        tgt_bos = NLLB_RNY_BOS
+    # ── 1. Phrase dictionary fast-path ────────────────────────────────────────
+    hit = phrase_lookup(req.text, is_rny_to_en)
+    if hit:
+        return TranslateResponse(translation=hit, direction=direction)
 
-    # v2 model: NO language codes, NO forced_bos_token_id
-    # The model learned direction from text patterns alone
+    # ── 2. Encode input ───────────────────────────────────────────────────────
     enc = tokenizer(
-        req.text,
-        return_tensors="pt",
-        max_length=256,
-        truncation=True,
+        req.text, return_tensors="pt", max_length=256, truncation=True
     ).to(device)
 
-    with torch.no_grad():
-        out = model.generate(
-            **enc,
-            num_beams=4,
-            max_length=256,
-            length_penalty=1.0,
-        )
+    # ── 3. Choose forced BOS token ────────────────────────────────────────────
+    if USING_RUT_PREFIX:
+        # rut-v1: hard-lock the decoder language
+        bos_id = ENG_TOKEN_ID if is_rny_to_en else RUT_TOKEN_ID
+    else:
+        # clean-v4 fallback: no forced BOS (best effort)
+        bos_id = None
 
-    raw = tokenizer.decode(out[0], skip_special_tokens=True)
-    translation = clean_translation(raw, tgt_bos)
+    capitalize = is_rny_to_en
+    translation = run_model(enc, bos_id, capitalize)
+
+    # ── 4. Echo guard (only meaningful in clean-v4 fallback mode) ─────────────
+    if not USING_RUT_PREFIX and is_echo(req.text, translation):
+        logger.warning("Echo detected for '%s', retrying with sampling", req.text)
+        with torch.no_grad():
+            out2 = model.generate(
+                **enc,
+                do_sample=True,
+                temperature=0.9,
+                top_p=0.95,
+                num_beams=1,
+                max_length=min(256, max(enc["input_ids"].shape[1] * 3, 20)),
+                repetition_penalty=1.3,
+                forced_bos_token_id=None,
+            )
+        raw2 = tokenizer.decode(out2[0], skip_special_tokens=True)
+        t2 = clean_translation(raw2, capitalize=capitalize)
+        if not is_echo(req.text, t2):
+            translation = t2
 
     return TranslateResponse(translation=translation, direction=direction)
 
 
-# ──────────────────────────────────────────────────────────────
-# Camera Lens OCR Endpoint
-# ──────────────────────────────────────────────────────────────
+# ── OCR endpoint ──────────────────────────────────────────────────────────────
 
 class OCRRequest(BaseModel):
-    image: str  # base64 encoded image (data URI or raw base64)
-    direction: str  # "English → Runyoro" or "Runyoro → English"
+    image: str
+    direction: str
 
 
 class TextBlock(BaseModel):
     text: str
     translation: str
-    bbox: List[List[int]]  # [[x0,y0],[x1,y1],[x2,y2],[x3,y3]]
+    bbox: List[List[int]]
     confidence: float
 
 
@@ -202,108 +346,57 @@ class OCRResponse(BaseModel):
 
 
 def preprocess_frame(img: np.ndarray) -> np.ndarray:
-    """OpenCV preprocessing to improve OCR accuracy."""
-    # Convert to grayscale
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
-    # Apply CLAHE (Contrast Limited Adaptive Histogram Equalization)
     clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
     enhanced = clahe.apply(gray)
-
-    # Denoise
     denoised = cv2.fastNlMeansDenoising(enhanced, None, h=10, templateWindowSize=7, searchWindowSize=21)
-
-    # Sharpen
     kernel = np.array([[0, -1, 0], [-1, 5, -1], [0, -1, 0]])
-    sharpened = cv2.filter2D(denoised, -1, kernel)
-
-    return sharpened
+    return cv2.filter2D(denoised, -1, kernel)
 
 
 def translate_text_sync(text: str, direction: str) -> str:
-    """Synchronous translation using the loaded NLLB model."""
     if not text.strip() or model is None:
         return text
-
     is_rny_to_en = "Runyoro" in direction and (
         "English" not in direction
         or direction.index("Runyoro") < direction.index("English")
     )
-    tgt_bos = NLLB_ENG_BOS if is_rny_to_en else NLLB_RNY_BOS
+    hit = phrase_lookup(text, is_rny_to_en)
+    if hit:
+        return hit
+    enc = tokenizer(text, return_tensors="pt", max_length=256, truncation=True).to(device)
+    bos_id = (ENG_TOKEN_ID if is_rny_to_en else RUT_TOKEN_ID) if USING_RUT_PREFIX else None
+    return run_model(enc, bos_id, capitalize=is_rny_to_en)
 
-    enc = tokenizer(
-        text,
-        return_tensors="pt",
-        max_length=256,
-        truncation=True,
-    ).to(device)
 
-    with torch.no_grad():
-        out = model.generate(
-            **enc,
-            num_beams=4,
-            max_length=256,
-            length_penalty=1.0,
-        )
-
-    raw = tokenizer.decode(out[0], skip_special_tokens=True)
-    return clean_translation(raw, tgt_bos)
-
-====
 @app.post("/ocr", response_model=OCRResponse)
 async def ocr_translate(req: OCRRequest):
-    """
-    Accepts a base64-encoded camera frame, runs OpenCV preprocessing,
-    EasyOCR text detection, and NLLB translation. Returns detected text
-    blocks with bounding boxes and translations for overlay rendering.
-    """
     if ocr_reader is None:
         raise HTTPException(status_code=503, detail="OCR engine still loading")
     if model is None:
-        raise HTTPException(status_code=503, detail="Translation model still loading")
+        raise HTTPException(status_code=503, detail="Model still loading")
 
-    # Decode base64 image
     try:
-        image_data = req.image
-        # Strip data URI prefix if present
-        if "," in image_data:
-            image_data = image_data.split(",", 1)[1]
-        img_bytes = base64.b64decode(image_data)
-        img_array = np.frombuffer(img_bytes, dtype=np.uint8)
-        img = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
+        img_data = req.image.split(",", 1)[1] if "," in req.image else req.image
+        img = cv2.imdecode(np.frombuffer(base64.b64decode(img_data), np.uint8), cv2.IMREAD_COLOR)
         if img is None:
             raise ValueError("Failed to decode image")
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Invalid image data: {e}")
+        raise HTTPException(status_code=400, detail=f"Invalid image: {e}")
 
-    img_height, img_width = img.shape[:2]
-
-    # OpenCV preprocessing for better OCR
-    processed = preprocess_frame(img)
-
-    # EasyOCR text detection
-    results = ocr_reader.readtext(processed, paragraph=False)
-
-    # Filter low-confidence results and short text
-    filtered = [
-        (bbox, text, conf)
-        for bbox, text, conf in results
-        if conf > 0.3 and len(text.strip()) > 1
-    ]
-
-    # Translate each detected text block
-    blocks: List[TextBlock] = []
-    for bbox, text, conf in filtered:
-        translation = translate_text_sync(text.strip(), req.direction)
-        # bbox from EasyOCR is [[x0,y0],[x1,y1],[x2,y2],[x3,y3]]
-        blocks.append(TextBlock(
-            text=text.strip(),
-            translation=translation,
+    h, w = img.shape[:2]
+    results = ocr_reader.readtext(preprocess_frame(img), paragraph=False)
+    blocks = [
+        TextBlock(
+            text=txt.strip(),
+            translation=translate_text_sync(txt.strip(), req.direction),
             bbox=[[int(p[0]), int(p[1])] for p in bbox],
             confidence=round(conf, 3),
-        ))
-
-    return OCRResponse(blocks=blocks, image_width=img_width, image_height=img_height)
+        )
+        for bbox, txt, conf in results
+        if conf > 0.3 and len(txt.strip()) > 1
+    ]
+    return OCRResponse(blocks=blocks, image_width=w, image_height=h)
 
 
 if __name__ == "__main__":

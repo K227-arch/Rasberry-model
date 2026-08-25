@@ -15,9 +15,9 @@ export default function BottomNavBar() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 w-full z-50 md:hidden">
-      <div className="bg-surface-container-lowest shadow-[0_-8px_24px_rgba(93,64,55,0.08)] rounded-t-xl">
-        <div className="flex justify-around items-center px-2 py-2 pb-safe">
+    <nav className="fixed bottom-0 left-0 right-0 z-[9999] md:hidden" style={{ position: 'fixed' }}>
+      <div className="bg-white shadow-[0_-4px_12px_rgba(0,0,0,0.1)] border-t border-gray-200">
+        <div className="flex justify-around items-center px-2 py-2 pb-2">
           {NAV_ITEMS.map((item) => {
             const isActive = pathname === item.href;
             return (

@@ -47,11 +47,6 @@ const TOOLS = [
   },
 ] as const;
 
-const SYSTEM_STATUS = [
-  { label: "Neural Engine", value: "Ready" },
-  { label: "Local Models", value: "64 Installed" },
-] as const;
-
 export default function HomePage() {
   const router = useRouter();
 
@@ -119,27 +114,6 @@ export default function HomePage() {
                 </div>
               );
             })}
-          </div>
-        </section>
-
-        {/* Status & Recent Activity */}
-        <section className="mb-lg">
-          <div className="bg-surface-container-low rounded-2xl p-md border border-outline-variant/50">
-            <div className="flex justify-between items-center mb-md">
-              <h3 className="text-label-md text-on-surface">SYSTEM STATUS</h3>
-              <div className="flex items-center gap-1.5">
-                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                <span className="text-label-sm text-on-surface-variant">Optimized</span>
-              </div>
-            </div>
-            <div className="space-y-sm">
-              {SYSTEM_STATUS.map((item, i) => (
-                <div key={i} className="flex items-center justify-between text-on-surface-variant">
-                  <span className="text-body-sm">{item.label}</span>
-                  <span className="text-label-md">{item.value}</span>
-                </div>
-              ))}
-            </div>
           </div>
         </section>
       </main>
