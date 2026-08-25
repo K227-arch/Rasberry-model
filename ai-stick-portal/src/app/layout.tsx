@@ -29,7 +29,7 @@ export default function RootLayout({
         {/* No Google Fonts CDN links — Inter is self-hosted via next/font,
             Material Symbols is served from /fonts/ in public/ */}
       </head>
-      <body className="bg-background text-on-background min-h-screen font-sans antialiased flex">
+      <body className="bg-background text-on-background min-h-screen font-sans antialiased flex overflow-x-hidden">
         {/* Desktop sidebar */}
         <Sidebar />
         {/* Main content shifts right on md+ */}

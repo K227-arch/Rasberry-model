@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import TopAppBar from "@/components/TopAppBar";
 import BottomNavBar from "@/components/BottomNavBar";
 
@@ -19,17 +19,25 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "Welcome! Type a message in English or Runyoro-Rutooro and I'll translate it for you.",
+      content: 'In Runyoro-Rutooro, you would say:\n\n**"Eizooba nirirasa ha nsozi."**',
+      lang: "RU",
+    },
+    {
+      role: "user",
+      content: 'Audio message • 0:04\n"Webale muno kunkonyera"',
+      lang: "RU",
+      isAudio: true,
+      duration: "0:04",
+      original: "Webale muno kunkonyera",
+    },
+    {
+      role: "assistant",
+      content: 'You\'re very welcome! (You said: "Thank you very much for helping me"). Is there anything else you\'d like to translate?',
       lang: "EN",
     },
   ]);
   const [input, setInput] = useState("");
   const [activeLang, setActiveLang] = useState<(typeof LANGUAGES)[number]>("English");
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
 
   const sendMessage = async () => {
     if (!input.trim()) return;
@@ -56,8 +64,8 @@ export default function ChatPage() {
           text: input,
           direction:
             activeLang === "English"
-              ? "English → Runyoro"
-              : "Runyoro → English",
+              ? "English → Runyoro-Rutooro"
+              : "Runyoro-Rutooro → English",
         }),
       });
       const data = await res.json();
@@ -86,10 +94,13 @@ export default function ChatPage() {
   return (
     <>
       <TopAppBar />
-      <main className="mt-16 md:mt-0 flex flex-col h-[calc(100dvh-4rem)] md:h-screen w-full max-w-3xl mx-auto">
+      <div className="w-full h-1 bg-surface-container overflow-hidden">
+        <div className="h-full bg-primary-container w-1/3 animate-pulse" />
+      </div>
+      <main className="mt-16 md:mt-0 flex-1 flex flex-col max-w-screen-xl mx-auto w-full px-margin-mobile md:px-8 lg:px-12 py-6 gap-6 pb-44 md:pb-24">
         {/* Language Toggle */}
-        <div className="flex justify-center gap-3 py-3 px-4 border-b border-outline-variant/30 bg-background/80 backdrop-blur-sm sticky top-16 md:top-0 z-10">
-          <div className="glass-card p-1 rounded-full flex gap-1">
+        <div className="flex justify-center gap-3 sticky top-20 md:top-4 z-40">
+          <div className="glass-card p-1 rounded-full flex gap-1 premium-shadow">
             {LANGUAGES.map((lang) => (
               <button
                 key={lang}
@@ -100,88 +111,121 @@ export default function ChatPage() {
                     : "hover:bg-surface-container-high text-on-surface-variant"
                 }`}
               >
-                {lang === "Runyoro-Rutooro" ? "Runyoro" : lang}
+                {lang}
               </button>
             ))}
           </div>
-          <span className="hidden sm:flex items-center text-label-sm text-on-surface-variant">
-            Input: {activeLang}
-          </span>
         </div>
 
-        {/* Messages Area */}
-        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+        {/* Messages */}
+        <div className="flex flex-col gap-4">
           {messages.map((msg, i) => (
-            <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+            <div key={i}>
               {msg.role === "user" ? (
-                <div className="flex flex-col items-end gap-1 max-w-[80%] sm:max-w-[70%]">
-                  <div className="bg-primary text-on-primary px-4 py-3 rounded-2xl rounded-tr-sm text-body-md">
-                    {msg.content}
-                  </div>
-                  <span className="text-on-surface-variant text-label-sm mr-1">
+                <div className="flex flex-col items-end gap-1 max-w-[85%] self-end ml-auto">
+                  {msg.isAudio ? (
+                    <div className="bg-primary text-on-primary p-4 rounded-xl rounded-tr-none premium-shadow flex items-center gap-3">
+                      <span
+                        className="material-symbols-outlined"
+                        style={{ fontVariationSettings: "'FILL' 1" }}
+                      >
+                        mic
+                      </span>
+                      <div className="flex flex-col">
+                        <span className="text-body-sm">Audio message • {msg.duration}</span>
+                        <span className="text-label-sm text-primary-fixed-dim italic">
+                          &ldquo;{msg.original}&rdquo;
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="bg-primary text-on-primary p-4 rounded-xl rounded-tr-none premium-shadow text-body-md">
+                      {msg.content}
+                    </div>
+                  )}
+                  <span className="text-on-surface-variant text-label-md font-semibold tracking-wider mr-1">
                     {msg.lang}
                   </span>
                 </div>
               ) : (
-                <div className="flex flex-col items-start gap-1 max-w-[80%] sm:max-w-[70%]">
-                  <div className="bg-surface-container-lowest border border-outline-variant/50 px-4 py-3 rounded-2xl rounded-tl-sm text-body-md">
+                <div className="flex flex-col items-start gap-1 max-w-[85%] self-start">
+                  <div className="bg-surface-container-lowest border border-outline-variant p-4 rounded-xl rounded-tl-none premium-shadow-lg text-body-md flex flex-col gap-3">
                     {msg.content === "Thinking..." ? (
                       <div className="flex items-center gap-2 text-outline">
-                        <span className="material-symbols-outlined animate-spin text-[18px]">
+                        <span className="material-symbols-outlined animate-spin">
                           progress_activity
                         </span>
-                        Translating...
+                        Thinking...
                       </div>
                     ) : (
-                      <p className="text-on-surface whitespace-pre-line">{msg.content}</p>
+                      <>
+                        <p className="text-on-surface whitespace-pre-line">{msg.content}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <button className="material-symbols-outlined text-on-surface-variant/40 text-[20px] p-1 rounded-full cursor-not-allowed" title="Audio coming soon" disabled>
+                            volume_up
+                          </button>
+                          <button
+                            onClick={() => navigator.clipboard.writeText(msg.content)}
+                            className="material-symbols-outlined text-on-surface-variant text-[20px] hover:bg-surface-container transition-all p-1 rounded-full cursor-pointer"
+                          >
+                            content_copy
+                          </button>
+                          <button className="material-symbols-outlined text-on-surface-variant text-[20px] hover:bg-surface-container transition-all p-1 rounded-full cursor-pointer">
+                            share
+                          </button>
+                        </div>
+                      </>
                     )}
                   </div>
-                  <div className="flex items-center gap-1 ml-1">
-                    <span className="text-on-surface-variant text-label-sm">{msg.lang}</span>
-                    {msg.content !== "Thinking..." && (
-                      <button
-                        onClick={() => navigator.clipboard.writeText(msg.content)}
-                        className="material-symbols-outlined text-on-surface-variant/60 text-[16px] hover:text-primary cursor-pointer"
-                        aria-label="Copy"
-                      >
-                        content_copy
-                      </button>
-                    )}
-                  </div>
+                  <span className="text-on-surface-variant text-label-md font-semibold tracking-wider ml-1">
+                    {msg.lang}
+                  </span>
                 </div>
               )}
             </div>
           ))}
-          <div ref={messagesEndRef} />
-        </div>
-
-        {/* Input Bar — positioned above bottom nav */}
-        <div className="border-t border-outline-variant/30 bg-background px-3 py-3 mb-16 md:mb-0">
-          <div className="flex items-end gap-2">
-            <textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  sendMessage();
-                }
-              }}
-              className="flex-1 bg-surface-container-low rounded-xl py-3 px-4 text-on-surface text-body-md focus:ring-2 focus:ring-primary resize-none outline-none border-none min-h-[44px] max-h-[120px]"
-              placeholder={`Type in ${activeLang}...`}
-              rows={1}
-            />
-            <button
-              onClick={sendMessage}
-              disabled={!input.trim()}
-              className="p-3 bg-primary text-on-primary rounded-xl hover:opacity-90 transition-all active:scale-90 disabled:opacity-40 cursor-pointer flex-shrink-0"
-              aria-label="Send"
-            >
-              <span className="material-symbols-outlined text-[22px]">send</span>
-            </button>
-          </div>
         </div>
       </main>
+
+      {/* Input Bar */}
+      <div className="fixed bottom-16 md:bottom-0 left-0 w-full z-40 md:ml-64 md:w-[calc(100%-16rem)]">
+        <div className="max-w-screen-xl mx-auto px-margin-mobile md:px-8 lg:px-12 pb-4">
+          <div className="bg-surface-container-lowest rounded-xl shadow-[0_-8px_24px_rgba(93,64,55,0.08)] border border-outline-variant p-3 flex items-end gap-3">
+            <button className="text-on-surface-variant hover:bg-surface-container transition-all rounded-lg active:scale-90 p-3 cursor-pointer" aria-label="Add">
+              <span className="material-symbols-outlined">add_circle</span>
+            </button>
+            <div className="flex-1 relative">
+              <textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                  }
+                }}
+                className="w-full bg-surface-container-low border-none rounded-lg py-3 px-4 text-on-surface text-body-md focus:ring-2 focus:ring-primary resize-none outline-none"
+                placeholder="Type or speak a message..."
+                rows={1}
+              />
+            </div>
+            <div className="flex gap-1">
+              <button className="p-3 bg-surface-container text-on-surface-variant/40 rounded-lg cursor-not-allowed" aria-label="Voice (coming soon)" title="Voice input coming soon" disabled>
+                <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>
+                  mic
+                </span>
+              </button>
+              <button
+                onClick={sendMessage}
+                className="p-3 bg-primary text-on-primary rounded-lg hover:opacity-90 transition-all active:scale-90 cursor-pointer"
+                aria-label="Send"
+              >
+                <span className="material-symbols-outlined">send</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
       <BottomNavBar />
     </>
   );

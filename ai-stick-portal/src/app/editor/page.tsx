@@ -60,7 +60,7 @@ export default function EditorPage() {
   return (
     <>
       <TopAppBar />
-      <main className="mt-16 md:mt-0 flex-1 flex flex-col w-full px-margin-mobile pt-6 pb-36 md:pb-8 max-w-5xl md:mx-auto">
+      <main className="mt-16 md:mt-0 flex-1 flex flex-col w-full px-margin-mobile md:px-8 lg:px-12 pt-6 pb-36 md:pb-8 max-w-5xl md:mx-auto">
         <div className="flex items-center gap-3 mb-6">
           <span className="material-symbols-outlined text-primary text-[28px]">
             edit_note

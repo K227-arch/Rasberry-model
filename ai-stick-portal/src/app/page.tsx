@@ -53,7 +53,7 @@ export default function HomePage() {
   return (
     <>
       <TopAppBar />
-      <main className="mt-16 px-margin-mobile pb-32">
+      <main className="mt-16 md:mt-0 px-margin-mobile md:px-8 lg:px-12 pb-36 md:pb-8 max-w-5xl md:mx-auto">
         {/* Hero Section */}
         <section className="py-lg">
           <div className="relative overflow-hidden rounded-3xl bg-surface-container-lowest p-lg premium-shadow border border-outline-variant/30">

@@ -50,7 +50,7 @@ export default function HistoryPage() {
   return (
     <>
       <TopAppBar />
-      <main className="mt-16 md:mt-0 flex-1 flex flex-col w-full px-margin-mobile pt-6 pb-36 md:pb-8 max-w-4xl md:mx-auto">
+      <main className="mt-16 md:mt-0 flex-1 flex flex-col w-full px-margin-mobile md:px-8 lg:px-12 pt-6 pb-36 md:pb-8 max-w-4xl md:mx-auto">
 
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
