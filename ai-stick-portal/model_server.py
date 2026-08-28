@@ -36,13 +36,19 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # ── Model path: prefer latest rut model, fall back to clean-v4 ───────────────
 _CKPT = os.path.join(BASE_DIR, "..", "runyoro_nmt", "models", "checkpoints")
+_RUT_V6   = os.path.join(_CKPT, "runyoro-rut-v6")
+_RUT_V5   = os.path.join(_CKPT, "runyoro-rut-v5")
 _RUT_V4   = os.path.join(_CKPT, "runyoro-rut-v4")
 _RUT_V3   = os.path.join(_CKPT, "runyoro-rut-v3")
 _RUT_V2   = os.path.join(_CKPT, "runyoro-rut-v2")
 _RUT_V1   = os.path.join(_CKPT, "runyoro-rut-v1")
 _CLEAN_V4 = os.path.join(_CKPT, "runyoro-clean-v4")
 
-if os.path.isdir(_RUT_V4):
+if os.path.isdir(_RUT_V6):
+    MODEL_PATH = _RUT_V6
+elif os.path.isdir(_RUT_V5):
+    MODEL_PATH = _RUT_V5
+elif os.path.isdir(_RUT_V4):
     MODEL_PATH = _RUT_V4
 elif os.path.isdir(_RUT_V3):
     MODEL_PATH = _RUT_V3

@@ -93,11 +93,15 @@ RAW_DIR       = ROOT.parent / "raw"
 V6_DATA_DIR   = ROOT / "data" / "v6_training"
 V7_DATA_DIR   = ROOT / "data" / "v7_training"
 V8_DATA_DIR   = ROOT / "data" / "v8_training"
+V9_DATA_DIR   = ROOT / "data" / "v9_training"
+V10_DATA_DIR  = ROOT / "data" / "v10_training"
 V7_DATA_DIR.mkdir(parents=True, exist_ok=True)
 V8_DATA_DIR.mkdir(parents=True, exist_ok=True)
+V9_DATA_DIR.mkdir(parents=True, exist_ok=True)
+V10_DATA_DIR.mkdir(parents=True, exist_ok=True)
 
-BASE_MODEL    = str(ROOT / "models" / "checkpoints" / "runyoro-rut-v3")
-OUTPUT_DIR    = ROOT / "models" / "checkpoints" / "runyoro-rut-v4"
+BASE_MODEL    = str(ROOT / "models" / "checkpoints" / "runyoro-rut-v5")
+OUTPUT_DIR    = ROOT / "models" / "checkpoints" / "runyoro-rut-v6"
 MAX_LEN       = 256
 
 # ---------------------------------------------------------------------------
@@ -114,6 +118,8 @@ NEW_FILES = [
     "sentence pair 12.xlsx",
     "sentence pairs 13 (1).xlsx",
     "senence pair 14.xlsx",
+    "sentence pairs 15.xlsx",
+    "sentence pair 16 (1).xlsx",
 ]
 
 
@@ -236,12 +242,12 @@ def step2_combine(new_pairs: List[Tuple[str, str]]) -> List[Tuple[str, str]]:
 
 def step3_save(unique: List[Tuple[str, str]]) -> List[Tuple[str, str]]:
     logger.info("=" * 60)
-    logger.info("STEP 3: Save clean pairs to v8_training/")
+    logger.info("STEP 3: Save clean pairs to v10_training/")
     logger.info("=" * 60)
     training = unique.copy()
     random.shuffle(training)
-    pd.DataFrame(unique,   columns=["Runyoro", "English"]).to_csv(V8_DATA_DIR / "cleaned_pairs.csv",      index=False)
-    pd.DataFrame(training, columns=["Runyoro", "English"]).to_csv(V8_DATA_DIR / "all_training_pairs.csv", index=False)
+    pd.DataFrame(unique,   columns=["Runyoro", "English"]).to_csv(V10_DATA_DIR / "cleaned_pairs.csv",      index=False)
+    pd.DataFrame(training, columns=["Runyoro", "English"]).to_csv(V10_DATA_DIR / "all_training_pairs.csv", index=False)
     logger.info("Saved: clean=%d  (no augmentation)", len(unique))
     return training
 
@@ -564,7 +570,7 @@ def step5_train(
         save_safetensors      = True,
         save_only_model       = True,
         report_to             = ["none"],
-        run_name              = "runyoro-rut-v4",
+        run_name              = "runyoro-rut-v6",
     )
 
     trainer = EWCTrainer(
@@ -578,8 +584,8 @@ def step5_train(
     )
 
     logger.info("=" * 60)
-    logger.info("CONTINUAL LEARNING: runyoro-rut-v4")
-    logger.info("  Base:        runyoro-rut-v3")
+    logger.info("CONTINUAL LEARNING: runyoro-rut-v6")
+    logger.info("  Base:        runyoro-rut-v5")
     logger.info("  Clean pairs: %d  |  Train samples (bidirectional): %d",
                 len(training_pairs), len(train_ds))
     logger.info("  Epochs: %d  |  LR: 1e-5  |  EWC λ: %.0f", n_epochs, ewc_lambda)
@@ -621,7 +627,7 @@ def step5_train(
         "ewc_lambda":         ewc_lambda,
         "base_model":         BASE_MODEL,
         "output_model":       str(OUTPUT_DIR),
-        "run_name":           "runyoro-rut-v4",
+        "run_name":           "runyoro-rut-v6",
         "total_clean_pairs":  len(anchor_pairs),
         "total_training_pairs": len(training_pairs),
         "epochs":             n_epochs,
@@ -663,13 +669,13 @@ def main() -> None:
         logger.info("  Clean pairs: %d", len(unique))
         return
 
-    # ── Anchor pairs = v7 clean pairs (what rut-v3 was trained on) ───────────
-    v7_csv = V7_DATA_DIR / "cleaned_pairs.csv"
-    if v7_csv.exists():
-        v7_df        = pd.read_csv(v7_csv)
-        anchor_pairs = [(str(r["Runyoro"]), str(r["English"])) for _, r in v7_df.iterrows()]
+    # ── Anchor pairs = v9 clean pairs (what rut-v5 was trained on) ───────────
+    v9_csv = V9_DATA_DIR / "cleaned_pairs.csv"
+    if v9_csv.exists():
+        v9_df        = pd.read_csv(v9_csv)
+        anchor_pairs = [(str(r["Runyoro"]), str(r["English"])) for _, r in v9_df.iterrows()]
     else:
-        logger.warning("v7 cleaned_pairs.csv not found — using all unique pairs as anchors")
+        logger.warning("v9 cleaned_pairs.csv not found — using all unique pairs as anchors")
         anchor_pairs = unique
 
     logger.info("Anchor pairs for EWC Fisher: %d", len(anchor_pairs))
