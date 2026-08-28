@@ -1,0 +1,10 @@
+{
+  "functions": {
+    "src/app/api/translate/route.ts": {
+      "maxDuration": 30
+    },
+    "src/app/api/ocr/route.ts": {
+      "maxDuration": 30
+    }
+  }
+}
