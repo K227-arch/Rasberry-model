@@ -14,7 +14,7 @@ async function translateViaLocal(text: string, direction: string) {
 
 async function translateViaHuggingFace(text: string, direction: string) {
   // Use the HuggingFace Space API (same interface as local server)
-  const HF_SPACE_URL = "https://kathay-runyoro-nmt-api.hf.space";
+  const HF_SPACE_URL = "https://keithtwesigye-runyoro-translator-api.hf.space";
 
   const res = await fetch(`${HF_SPACE_URL}/translate`, {
     method: "POST",

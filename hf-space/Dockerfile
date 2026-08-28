@@ -2,13 +2,19 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
+# Install dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copy app
 COPY app.py .
 
-# Download model at build time so it's cached
-RUN python -c "from transformers import AutoModelForSeq2SeqLM, AutoTokenizer; AutoTokenizer.from_pretrained('kathay/runyoro-nmt'); AutoModelForSeq2SeqLM.from_pretrained('kathay/runyoro-nmt')"
+# Pre-download model at build time so cold starts are instant
+RUN python -c "\
+from transformers import AutoModelForSeq2SeqLM, AutoTokenizer; \
+AutoTokenizer.from_pretrained('keithtwesigye/runyoro-nmt'); \
+AutoModelForSeq2SeqLM.from_pretrained('keithtwesigye/runyoro-nmt', torch_dtype='float32'); \
+print('Model cached.')"
 
 EXPOSE 7860
 

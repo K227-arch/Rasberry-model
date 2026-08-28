@@ -1,24 +1,36 @@
 ---
-title: Runyoro NMT Translation API
+title: Runyoro NMT API
 emoji: 🌍
-colorFrom: blue
+colorFrom: yellow
 colorTo: green
 sdk: docker
+app_port: 7860
 pinned: false
 ---
 
-# Runyoro-NMT Translation API
+# Runyoro-Rutooro ↔ English Translation API
 
-Bidirectional Runyoro-Rutooro ↔ English Neural Machine Translation.
+FastAPI backend for the AI Stick portal. Serves bidirectional Runyoro-Rutooro ↔ English neural machine translation using `keithtwesigye/runyoro-nmt` (NLLB-200-distilled-1.3B fine-tuned with continual learning).
 
-## API Usage
+## Endpoints
 
-```bash
-curl -X POST https://kathay-runyoro-nmt-api.hf.space/translate \
-  -H "Content-Type: application/json" \
-  -d '{"text": "Uganda exports coffee to many countries", "direction": "English to Runyoro"}'
+- `GET /health` — health check
+- `POST /translate` — translate text
+
+## Request format
+
+```json
+{
+  "text": "Hello",
+  "direction": "English → Runyoro"
+}
 ```
 
-## Model
+## Response
 
-Uses `kathay/runyoro-nmt` with direction prefixes (`>>rny<<` / `>>eng<<`).
+```json
+{
+  "translation": "osiibwe",
+  "direction": "English → Runyoro"
+}
+```
