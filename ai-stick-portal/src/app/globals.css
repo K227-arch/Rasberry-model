@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+/* Inter — served locally, no CDN dependency */
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/fonts/Inter.woff2") format("woff2");
+}
+
 /* Material Symbols Outlined — served locally, no CDN dependency */
 @font-face {
   font-family: "Material Symbols Outlined";
@@ -57,7 +66,7 @@
   --color-background: #fbf9f5;
   --color-on-background: #1b1c1a;
   --color-surface-variant: #e4e2de;
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-display-lg: ["Inter", "sans-serif"];
   --font-headline-md: ["Inter", "sans-serif"];
   --font-headline-sm: ["Inter", "sans-serif"];

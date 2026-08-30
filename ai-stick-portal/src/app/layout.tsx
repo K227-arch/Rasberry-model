@@ -1,15 +1,9 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import Sidebar from "@/components/Sidebar";
 
-// Inter is self-hosted by Next.js at build time — no Google CDN request at runtime
-const inter = Inter({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
-  variable: "--font-inter",
-  display: "swap",
-});
+// Inter and Material Symbols are both served from /public/fonts/
+// Zero Google CDN requests — fully offline-capable
 
 export const metadata: Metadata = {
   title: "AI Stick — Runyoro-Rutooro Language Portal",
@@ -22,17 +16,13 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`h-full ${inter.variable}`} suppressHydrationWarning>
+    <html lang="en" className="h-full" suppressHydrationWarning>
       <head>
         <link rel="icon" type="image/png" href="/favicon.png" />
         <link rel="apple-touch-icon" href="/logo.png" />
-        {/* No Google Fonts CDN links — Inter is self-hosted via next/font,
-            Material Symbols is served from /fonts/ in public/ */}
       </head>
       <body className="bg-background text-on-background min-h-screen font-sans antialiased flex overflow-x-hidden">
-        {/* Desktop sidebar */}
         <Sidebar />
-        {/* Main content shifts right on md+ */}
         <div className="flex-1 md:ml-64 flex flex-col min-h-screen">
           {children}
         </div>
