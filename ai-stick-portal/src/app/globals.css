@@ -1,21 +1,21 @@
 @import "tailwindcss";
 
-/* Inter — served locally, no CDN dependency */
+/* ─── Local fonts — zero Google CDN ────────────────────────────────────── */
+
 @font-face {
-  font-family: "Inter";
+  font-family: Inter;
   font-style: normal;
   font-weight: 100 900;
   font-display: swap;
-  src: url("/fonts/Inter.woff2") format("woff2");
+  src: url("/fonts/Inter.woff2") format(woff2);
 }
 
-/* Material Symbols Outlined — served locally, no CDN dependency */
 @font-face {
   font-family: "Material Symbols Outlined";
   font-style: normal;
   font-weight: 100 700;
   font-display: block;
-  src: url("/fonts/MaterialSymbolsOutlined.woff2") format("woff2");
+  src: url("/fonts/MaterialSymbolsOutlined.woff2") format(woff2);
 }
 
 @theme inline {
@@ -66,16 +66,16 @@
   --color-background: #fbf9f5;
   --color-on-background: #1b1c1a;
   --color-surface-variant: #e4e2de;
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-display-lg: ["Inter", "sans-serif"];
-  --font-headline-md: ["Inter", "sans-serif"];
-  --font-headline-sm: ["Inter", "sans-serif"];
-  --font-body-lg: ["Inter", "sans-serif"];
-  --font-body-md: ["Inter", "sans-serif"];
-  --font-body-sm: ["Inter", "sans-serif"];
-  --font-label-md: ["Inter", "sans-serif"];
-  --font-label-sm: ["Inter", "sans-serif"];
-  --font-headline-lg-mobile: ["Inter", "sans-serif"];
+  --font-sans: Inter, ui-sans-serif, system-ui, sans-serif;
+  --font-display-lg: Inter, ui-sans-serif, system-ui, sans-serif;
+  --font-headline-md: Inter, ui-sans-serif, system-ui, sans-serif;
+  --font-headline-sm: Inter, ui-sans-serif, system-ui, sans-serif;
+  --font-body-lg: Inter, ui-sans-serif, system-ui, sans-serif;
+  --font-body-md: Inter, ui-sans-serif, system-ui, sans-serif;
+  --font-body-sm: Inter, ui-sans-serif, system-ui, sans-serif;
+  --font-label-md: Inter, ui-sans-serif, system-ui, sans-serif;
+  --font-label-sm: Inter, ui-sans-serif, system-ui, sans-serif;
+  --font-headline-lg-mobile: Inter, ui-sans-serif, system-ui, sans-serif;
   --radius-sm: 0.25rem;
   --radius-default: 0.5rem;
   --radius-md: 0.75rem;
@@ -108,7 +108,7 @@
 }
 
 .material-symbols-outlined {
-  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
   display: inline-block;
   line-height: 1;
   text-transform: none;
@@ -116,6 +116,7 @@
   word-wrap: normal;
   white-space: nowrap;
   direction: ltr;
+  -webkit-font-smoothing: antialiased;
 }
 
 * {
