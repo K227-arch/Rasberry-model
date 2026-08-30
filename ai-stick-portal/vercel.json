@@ -1,9 +1,9 @@
 {
   "functions": {
-    "src/app/api/translate/route.ts": {
+    "app/api/translate/route": {
       "maxDuration": 30
     },
-    "src/app/api/ocr/route.ts": {
+    "app/api/ocr/route": {
       "maxDuration": 30
     }
   }
