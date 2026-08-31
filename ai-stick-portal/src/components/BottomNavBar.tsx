@@ -4,20 +4,20 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const NAV_ITEMS = [
-  { label: "Home",       icon: "home",         href: "/",           fillIcon: "home"         },
-  { label: "Translate",  icon: "g_translate",   href: "/translate",  fillIcon: "g_translate"  },
-  { label: "Lens",       icon: "photo_camera",  href: "/lens",       fillIcon: "photo_camera" },
-  { label: "Chat",       icon: "chat_bubble",   href: "/chat",       fillIcon: "chat_bubble"  },
-  { label: "Dictionary", icon: "menu_book",     href: "/dictionary", fillIcon: "menu_book"    },
+  { label: "Home",       icon: "home",         href: "/",          fillIcon: "home"         },
+  { label: "Translate",  icon: "g_translate",  href: "/translate", fillIcon: "g_translate"  },
+  { label: "Lens",       icon: "photo_camera", href: "/lens",      fillIcon: "photo_camera" },
+  { label: "Chat",       icon: "chat_bubble",  href: "/chat",      fillIcon: "chat_bubble"  },
+  { label: "Dictionary", icon: "menu_book",    href: "/dictionary",fillIcon: "menu_book"    },
 ] as const;
 
 export default function BottomNavBar() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-[9999] md:hidden" style={{ position: 'fixed' }}>
-      <div className="bg-white shadow-[0_-4px_12px_rgba(0,0,0,0.1)] border-t border-gray-200">
-        <div className="flex justify-around items-center px-2 py-2 pb-2">
+    <nav className="fixed bottom-0 left-0 w-full z-50 md:hidden">
+      <div className="bg-surface-container-lowest shadow-[0_-8px_24px_rgba(93,64,55,0.08)] rounded-t-xl">
+        <div className="flex justify-around items-center px-2 py-2 pb-safe">
           {NAV_ITEMS.map((item) => {
             const isActive = pathname === item.href;
             return (

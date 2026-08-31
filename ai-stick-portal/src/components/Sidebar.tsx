@@ -4,14 +4,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const NAV_ITEMS = [
-  { label: "Home",        icon: "home",         href: "/"           },
-  { label: "Translate",   icon: "g_translate",   href: "/translate"  },
-  { label: "Lens",        icon: "photo_camera",  href: "/lens"       },
-  { label: "Chat",        icon: "chat_bubble",   href: "/chat"       },
-  { label: "Editor",      icon: "edit_note",     href: "/editor"     },
-  { label: "Dictionary",  icon: "menu_book",     href: "/dictionary" },
-  { label: "History",     icon: "history",       href: "/history"    },
-  { label: "Settings",    icon: "settings",      href: "/settings"   },
+  { label: "Home",       icon: "home",         href: "/"           },
+  { label: "Translate",  icon: "g_translate",  href: "/translate"  },
+  { label: "Lens",       icon: "photo_camera", href: "/lens"       },
+  { label: "Chat",       icon: "chat_bubble",  href: "/chat"       },
+  { label: "Editor",     icon: "edit_note",    href: "/editor"     },
+  { label: "Dictionary", icon: "menu_book",    href: "/dictionary" },
+  { label: "History",    icon: "history",      href: "/history"    },
+  { label: "Settings",   icon: "settings",     href: "/settings"   },
 ] as const;
 
 export default function Sidebar() {
@@ -21,7 +21,8 @@ export default function Sidebar() {
     <aside className="hidden md:flex flex-col w-64 bg-surface-container-lowest border-r border-outline-variant/30 fixed top-0 left-0 h-full z-50 premium-shadow">
       {/* Logo */}
       <div className="flex items-center gap-3 px-6 h-16 border-b border-outline-variant/30">
-        <img src="/logo.png" alt="AI Stick Logo" className="h-10 w-auto" />        <div>
+        <span className="material-symbols-outlined text-primary text-[32px]">stylus</span>
+        <div>
           <h1 className="text-display-lg text-primary leading-tight">AI Stick</h1>
           <p className="text-label-sm text-on-surface-variant -mt-0.5">Offline Intelligence</p>
         </div>

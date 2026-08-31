@@ -8,7 +8,7 @@ export default function TopAppBar() {
     <header className="bg-surface-bright shadow-sm fixed top-0 w-full z-40 md:hidden">
       <div className="flex justify-between items-center px-margin-mobile h-16">
         <Link href="/" className="flex items-center gap-2">
-          <img src="/logo.png" alt="AI Stick Logo" className="h-9 w-auto" />
+          <span className="material-symbols-outlined text-primary text-[30px]">stylus</span>
           <h1 className="text-display-lg text-primary leading-tight">AI Stick</h1>
         </Link>
         <div className="flex items-center gap-2">

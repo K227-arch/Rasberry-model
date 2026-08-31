@@ -1,5 +1,4 @@
 "use client";
-
 import { useRouter } from "next/navigation";
 import TopAppBar from "@/components/TopAppBar";
 import BottomNavBar from "@/components/BottomNavBar";
@@ -47,13 +46,18 @@ const TOOLS = [
   },
 ] as const;
 
+const SYSTEM_STATUS = [
+  { label: "Neural Engine", value: "Ready" },
+  { label: "Local Models", value: "64 Installed" },
+] as const;
+
 export default function HomePage() {
   const router = useRouter();
 
   return (
     <>
       <TopAppBar />
-      <main className="mt-16 md:mt-0 px-margin-mobile md:px-8 lg:px-12 pb-36 md:pb-8 max-w-5xl md:mx-auto">
+      <main className="mt-16 px-margin-mobile pb-32">
         {/* Hero Section */}
         <section className="py-lg">
           <div className="relative overflow-hidden rounded-3xl bg-surface-container-lowest p-lg premium-shadow border border-outline-variant/30">
@@ -69,7 +73,8 @@ export default function HomePage() {
               <p className="text-body-md text-on-surface-variant max-w-[80%] mb-lg">
                 Premium AI processing for global professionals. No cloud. No limits. Just performance.
               </p>
-              <button className="bg-primary text-on-primary px-lg py-md rounded-xl text-label-md flex items-center gap-2 active:scale-95 transition-all shadow-md cursor-pointer"
+              <button
+                className="bg-primary text-on-primary px-lg py-md rounded-xl text-label-md flex items-center gap-2 active:scale-95 transition-all shadow-md cursor-pointer"
                 onClick={() => router.push("/translate")}
               >
                 START NEW PROJECT
@@ -92,7 +97,7 @@ export default function HomePage() {
               const baseClasses = "glass-card rounded-2xl flex flex-col gap-sm hover:border-primary transition-colors cursor-pointer group premium-shadow";
               const sizeClasses = {
                 large: "col-span-2 p-lg",
-                wide: "col-span-2 p-md flex items-center gap-md",
+                wide:  "col-span-2 p-md flex items-center gap-md",
                 small: "p-md",
               };
               return (
@@ -114,6 +119,27 @@ export default function HomePage() {
                 </div>
               );
             })}
+          </div>
+        </section>
+
+        {/* Status */}
+        <section className="mb-lg">
+          <div className="bg-surface-container-low rounded-2xl p-md border border-outline-variant/50">
+            <div className="flex justify-between items-center mb-md">
+              <h3 className="text-label-md text-on-surface">SYSTEM STATUS</h3>
+              <div className="flex items-center gap-1.5">
+                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                <span className="text-label-sm text-on-surface-variant">Optimized</span>
+              </div>
+            </div>
+            <div className="space-y-sm">
+              {SYSTEM_STATUS.map((item, i) => (
+                <div key={i} className="flex items-center justify-between text-on-surface-variant">
+                  <span className="text-body-sm">{item.label}</span>
+                  <span className="text-label-md">{item.value}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
       </main>
