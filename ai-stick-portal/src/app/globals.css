@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* ─── Local fonts — zero Google CDN ────────────────────────────────────── */
+/* ─── Local fonts — no Google CDN ─────────────────────────────────────────── */
 
 @font-face {
   font-family: Inter;
@@ -17,6 +17,8 @@
   font-display: block;
   src: url("/fonts/MaterialSymbolsOutlined.woff2") format(woff2);
 }
+
+/* ─── Design tokens (original M3 palette, unchanged) ─────────────────────── */
 
 @theme inline {
   --color-surface: #fbf9f5;
@@ -66,6 +68,8 @@
   --color-background: #fbf9f5;
   --color-on-background: #1b1c1a;
   --color-surface-variant: #e4e2de;
+
+  /* Font stacks — valid CSS, no JSON array syntax */
   --font-sans: Inter, ui-sans-serif, system-ui, sans-serif;
   --font-display-lg: Inter, ui-sans-serif, system-ui, sans-serif;
   --font-headline-md: Inter, ui-sans-serif, system-ui, sans-serif;
@@ -76,6 +80,7 @@
   --font-label-md: Inter, ui-sans-serif, system-ui, sans-serif;
   --font-label-sm: Inter, ui-sans-serif, system-ui, sans-serif;
   --font-headline-lg-mobile: Inter, ui-sans-serif, system-ui, sans-serif;
+
   --radius-sm: 0.25rem;
   --radius-default: 0.5rem;
   --radius-md: 0.75rem;
@@ -93,6 +98,8 @@
   --shadow-ambient-lg: 0 8px 32px -4px rgba(93, 64, 55, 0.12);
 }
 
+/* ─── Custom utilities ────────────────────────────────────────────────────── */
+
 @utility premium-shadow {
   box-shadow: var(--shadow-ambient);
 }
@@ -107,6 +114,8 @@
   border: 1px solid rgba(231, 226, 216, 0.5);
 }
 
+/* ─── Material Symbols icon font ──────────────────────────────────────────── */
+
 .material-symbols-outlined {
   font-family: "Material Symbols Outlined";
   font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
@@ -120,6 +129,8 @@
   -webkit-font-smoothing: antialiased;
 }
 
+/* ─── Base ────────────────────────────────────────────────────────────────── */
+
 * {
   -webkit-tap-highlight-color: transparent;
 }
@@ -129,6 +140,8 @@ body {
   background-color: var(--color-background);
   color: var(--color-on-background);
 }
+
+/* ─── Typography scale (original) ────────────────────────────────────────── */
 
 @layer utilities {
   .text-display-lg {
