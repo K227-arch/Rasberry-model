@@ -127,6 +127,7 @@
   white-space: nowrap;
   direction: ltr;
   -webkit-font-smoothing: antialiased;
+  user-select: none;
 }
 
 /* ─── Base ────────────────────────────────────────────────────────────────── */

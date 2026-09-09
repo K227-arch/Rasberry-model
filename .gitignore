@@ -57,3 +57,12 @@ C:/tmp/
 # ── Large data files (dataset pushed to HF Hub) ──────────────────────────────
 # Keep TSV splits and reports, exclude huge augmented files if > 10MB
 # (the TSV files are small enough to commit)
+
+# ── One-off helper scripts ─────────────────────────────────────────────────────
+runyoro_nmt/_fetch_*.py
+upload_rut_meta.py
+generate_*.py
+# ── Generated documents ────────────────────────────────────────────────────────
+*.docx
+# ── Vercel local env ───────────────────────────────────────────────────────────
+ai-stick-portal/.env.local

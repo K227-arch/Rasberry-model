@@ -45,18 +45,19 @@ export default function SettingsPage() {
       items: [
         { label: "Command",  value: "python model_server.py"                    },
         { label: "Location", value: "ai-stick-portal/model_server.py"           },
-        { label: "Model",    value: "kathay/runyoro-nmt-v1 (NLLB-200 1.3B)"     },
+        { label: "Model",    value: "kathay/runyoro-nmt (NLLB-200 1.3B)"        },
       ],
     },
     {
       title: "About",
       items: [
-        { label: "App",         value: "AI Stick — Offline Language Intelligence" },
-        { label: "Model",       value: "runyoro-nmt-v1"                           },
-        { label: "Language pair",value: "Runyoro-Rutooro ↔ English"              },
-        { label: "HF Hub",      value: "kathay/runyoro-nmt-v1"                   },
-        { label: "Dataset",     value: "kathay/runyoro-rutooro-en-parallel"       },
-        { label: "Version",     value: "1.0.0"                                   },
+        { label: "App",          value: "AI Stick — Offline Language Intelligence" },
+        { label: "Model",        value: "runyoro-nmt"                              },
+        { label: "Language pair", value: "Runyoro-Rutooro ↔ English"             },
+        { label: "HF Model",     value: "kathay/runyoro-nmt"                      },
+        { label: "HF Space",     value: "kathay/runyoro-nmt-api"                  },
+        { label: "Dataset",      value: "kathay/runyoro-rutooro-en-parallel"      },
+        { label: "Version",      value: "1.0.0"                                   },
       ],
     },
   ];

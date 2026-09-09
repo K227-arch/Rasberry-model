@@ -6,7 +6,7 @@ export const maxDuration = 30;
 const PYTHON_BACKEND = process.env.MODEL_API_URL || "http://127.0.0.1:8000";
 const HF_SPACE_URL =
   process.env.HF_SPACE_URL ||
-  "https://keithtwesigye-runyoro-translator-api.hf.space";
+  "https://kathay-runyoro-nmt-api.hf.space";
 
 // On Vercel the local backend is never available — skip it to save time
 const IS_VERCEL = !!process.env.VERCEL;

@@ -1,0 +1,3 @@
+[submodule "hf-spaces/runyoro-translator-api"]
+	path = hf-spaces/runyoro-translator-api
+	url = https://huggingface.co/spaces/keithtwesigye/runyoro-translator-api
