@@ -34,31 +34,18 @@ logger = logging.getLogger("model_server")
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# ── Model path: prefer latest rut model, fall back to clean-v4 ───────────────
-_CKPT = os.path.join(BASE_DIR, "..", "runyoro_nmt", "models", "checkpoints")
-_RUT_V10  = os.path.join(_CKPT, "runyoro-rut-v10")
-_RUT_V6   = os.path.join(_CKPT, "runyoro-rut-v6")
-_RUT_V5   = os.path.join(_CKPT, "runyoro-rut-v5")
-_RUT_V4   = os.path.join(_CKPT, "runyoro-rut-v4")
-_RUT_V3   = os.path.join(_CKPT, "runyoro-rut-v3")
-_RUT_V2   = os.path.join(_CKPT, "runyoro-rut-v2")
-_RUT_V1   = os.path.join(_CKPT, "runyoro-rut-v1")
+# ── Model path: runyoro-rut-v11 is the active model ──────────────────────────
+# v11 is the result of continual learning from v10 on 1,229 new sentence pairs.
+# Previous versions (v10 and below) are redundant — v11 contains all their knowledge.
+_CKPT     = os.path.join(BASE_DIR, "..", "runyoro_nmt", "models", "checkpoints")
+_RUT_V11  = os.path.join(_CKPT, "runyoro-rut-v11")
+_RUT_V10  = os.path.join(_CKPT, "runyoro-rut-v10")   # fallback only
 _CLEAN_V4 = os.path.join(_CKPT, "runyoro-clean-v4")
 
-if os.path.isdir(_RUT_V10):
+if os.path.isdir(_RUT_V11):
+    MODEL_PATH = _RUT_V11
+elif os.path.isdir(_RUT_V10):
     MODEL_PATH = _RUT_V10
-elif os.path.isdir(_RUT_V6):
-    MODEL_PATH = _RUT_V6
-elif os.path.isdir(_RUT_V5):
-    MODEL_PATH = _RUT_V5
-elif os.path.isdir(_RUT_V4):
-    MODEL_PATH = _RUT_V4
-elif os.path.isdir(_RUT_V3):
-    MODEL_PATH = _RUT_V3
-elif os.path.isdir(_RUT_V2):
-    MODEL_PATH = _RUT_V2
-elif os.path.isdir(_RUT_V1):
-    MODEL_PATH = _RUT_V1
 else:
     MODEL_PATH = _CLEAN_V4
 
