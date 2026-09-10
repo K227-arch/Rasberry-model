@@ -17,7 +17,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 
-MODEL_ID = os.getenv("MODEL_ID", "keithtwesigye/runyoro-nmt")
+MODEL_ID = os.getenv("MODEL_ID", "kathay/runyoro-nmt")
 
 # ---------------------------------------------------------------------------
 # Phrase dictionary fast-path
