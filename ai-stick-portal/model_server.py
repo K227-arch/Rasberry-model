@@ -34,18 +34,18 @@ logger = logging.getLogger("model_server")
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# ── Model path: runyoro-rut-v11 is the active model ──────────────────────────
-# v11 is the result of continual learning from v10 on 1,229 new sentence pairs.
-# Previous versions (v10 and below) are redundant — v11 contains all their knowledge.
+# ── Model path: runyoro-rut-v12 is the active model ──────────────────────────
+# v12 = continual learning from v11, trained on sp19 + all 19 datasets.
+# Previous versions are redundant — v12 contains all accumulated knowledge.
 _CKPT     = os.path.join(BASE_DIR, "..", "runyoro_nmt", "models", "checkpoints")
-_RUT_V11  = os.path.join(_CKPT, "runyoro-rut-v11")
-_RUT_V10  = os.path.join(_CKPT, "runyoro-rut-v10")   # fallback only
+_RUT_V12  = os.path.join(_CKPT, "runyoro-rut-v12")
+_RUT_V11  = os.path.join(_CKPT, "runyoro-rut-v11")   # fallback
 _CLEAN_V4 = os.path.join(_CKPT, "runyoro-clean-v4")
 
-if os.path.isdir(_RUT_V11):
+if os.path.isdir(_RUT_V12):
+    MODEL_PATH = _RUT_V12
+elif os.path.isdir(_RUT_V11):
     MODEL_PATH = _RUT_V11
-elif os.path.isdir(_RUT_V10):
-    MODEL_PATH = _RUT_V10
 else:
     MODEL_PATH = _CLEAN_V4
 

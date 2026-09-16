@@ -38,8 +38,8 @@ log = logging.getLogger("train")
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
 CKPT_ROOT  = pathlib.Path(r"C:\Users\keith\Desktop\projects\runyoro_nmt\models\checkpoints")
-MODEL_PATH = CKPT_ROOT / "runyoro-rut-v10"
-OUT_PATH   = CKPT_ROOT / "runyoro-rut-v11"
+MODEL_PATH = CKPT_ROOT / "runyoro-rut-v11"
+OUT_PATH   = CKPT_ROOT / "runyoro-rut-v12"
 DATA_DIR   = pathlib.Path(r"C:\Users\keith\Desktop\projects\Rasberry-model\pipeline_data")
 HF_REPO    = "kathay/runyoro-nmt"
 HF_TOKEN   = os.environ.get("HF_WRITE_TOKEN", "")
@@ -224,7 +224,7 @@ def evaluate_split(dl, label="val"):
 
 # ── Training loop ─────────────────────────────────────────────────────────────
 log.info("="*60)
-log.info(f"Training: {MODEL_PATH.name} → runyoro-rut-v11")
+log.info(f"Training: {MODEL_PATH.name} → runyoro-rut-v12")
 log.info(f"  Train: {len(train_ds)} examples  Val: {len(val_ds)} examples")
 log.info(f"  Epochs: {EPOCHS}  LR: {LR}  Batch: {BATCH_SIZE} × {GRAD_ACCUM} accum = {BATCH_SIZE*GRAD_ACCUM} (single GPU)")
 log.info("="*60)
@@ -305,8 +305,8 @@ if rut_meta.exists():
     shutil.copy(str(rut_meta), str(OUT_PATH / "rut_token_meta.json"))
 
 meta = {
-    "model":             "runyoro-rut-v11",
-    "continued_from":    "runyoro-rut-v10",
+    "model":             "runyoro-rut-v12",
+    "continued_from":    "runyoro-rut-v11",
     "strategy":          "continue_training_clean_only_no_bt",
     "base_model":        "facebook/nllb-200-distilled-1.3B",
     "new_train_pairs":   len(train_ds) // 2,
@@ -334,7 +334,7 @@ api.upload_folder(
     folder_path = str(OUT_PATH),
     repo_id     = HF_REPO,
     repo_type   = "model",
-    commit_message = f"runyoro-rut-v11: continue-train on 1445 new clean pairs, no BT, dual RTX4090, bleu={test_bleu} chrf={test_chrf}",
+    commit_message = f"runyoro-rut-v12: continue-train on sp19 + all datasets, bleu={test_bleu} chrf={test_chrf}",
     ignore_patterns = ["checkpoint-epoch*/**"],
 )
 log.info(f"Pushed to {HF_REPO} ✓")
