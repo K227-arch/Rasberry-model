@@ -1,7 +1,7 @@
-"""
-Runyoro-NMT Translation API — HuggingFace Space (runyoro-rut-v4)
+ """
+Runyoro-NMT Translation API — HuggingFace Space (runyoro-rut-v12)
 =================================================================
-Loads keithtwesigye/runyoro-nmt from the Hub.
+Loads kathay/runyoro-nmt (v12) from the Hub.
 Uses forced_bos_token_id (rut_Latn / eng_Latn) to lock decoder language.
 Phrase dictionary fast-path for common phrases.
 """
