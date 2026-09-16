@@ -8,6 +8,9 @@ Phrase dictionary fast-path for common phrases.
 import json
 import os
 import re
+import threading
+import time
+import urllib.request
 from contextlib import asynccontextmanager
 from typing import Optional
 
@@ -127,6 +130,26 @@ async def lifespan(app: FastAPI):
             print("No rut_Latn token — running without forced BOS (phrase dict active)")
 
     print("Ready.")
+
+    # ── Keep-alive: ping own /health every 4 min to prevent HF Space sleeping ──
+    _port = int(os.getenv("PORT", 7860))
+    _self = f"http://127.0.0.1:{_port}/health"
+
+    def _keep_alive():
+        # Wait for server to be fully up before first ping
+        time.sleep(30)
+        while True:
+            try:
+                with urllib.request.urlopen(_self, timeout=10) as r:
+                    print(f"[keep-alive] ping OK ({r.status})")
+            except Exception as e:
+                print(f"[keep-alive] ping failed: {e}")
+            time.sleep(240)  # 4 minutes
+
+    _t = threading.Thread(target=_keep_alive, daemon=True, name="keep-alive")
+    _t.start()
+    print(f"[keep-alive] thread started — pinging {_self} every 4 min")
+
     yield
 
 
