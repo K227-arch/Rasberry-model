@@ -1,0 +1,7 @@
+=== Stage 2 — Validation Report ===
+Input pairs  : 1725
+Valid pairs  : 1643
+Rejected     : 82
+
+Rejection breakdown:
+  Duplicate: 82

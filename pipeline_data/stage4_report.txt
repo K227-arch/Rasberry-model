@@ -1,0 +1,8 @@
+=== Stage 4 — Merge & Split Report ===
+Existing HF pairs      : 4520
+New extracted pairs    : 1643
+  Train                : 1397
+  Val                  : 164
+  Test                 : 82
+BT pairs               : 0 (excluded per spec)
+Split ratio            : 85/10/5  seed=42

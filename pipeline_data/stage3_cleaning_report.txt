@@ -1,0 +1,4 @@
+=== Stage 3 — Cleaning Report ===
+Total pairs    : 1643
+Pairs modified : 55  (3.3%)
+Unchanged      : 1588
